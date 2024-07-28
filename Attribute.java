@@ -53,8 +53,10 @@ public sealed class Attribute permits Artifact {
 			HYDRO_DMG_BONUS, DENDRO_DMG_BONUS, ANEMO_DMG_BONUS,
 			GEO_DMG_BONUS, PHYSICAL_DMG_BONUS, HEALING_BONUS 
 	};
-	public static final String[] PERCENTAGE_ATTRIBUTE = { "HP%", "ATK%", "DEF%", 
-			"Energy Recharge%", "CRIT Rate%", "CRIT DMG%" };
+	public static final String[] PERCENTAGE_ATTRIBUTE = { 
+			"HP%", "ATK%", "DEF%", 
+			"Energy Recharge%", "CRIT Rate%", "CRIT DMG%" 
+	};
 	
 	public boolean isNotSpecial(String attribute) {
 		for(String attributes : ATTRIBUTES) {

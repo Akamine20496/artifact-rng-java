@@ -200,26 +200,26 @@ public class Artifact_Piece extends JPanel {
 	
 	private void slot(int slotNumber) {
 		switch(slotNumber) {
-			case 1:
+			case 1 -> {
 				prevValue1 = value1;
 				value1 += artifact.generateValue(att1);
 				displayUpgrade(lblSlot1, att1, prevValue1, value1);
-				break;
-			case 2:
+			}
+			case 2 -> {
 				prevValue2 = value2;
 				value2 += artifact.generateValue(att2);
 				displayUpgrade(lblSlot2, att2, prevValue2, value2);
-				break;
-			case 3:
+			}
+			case 3 -> {
 				prevValue3 = value3;
 				value3 += artifact.generateValue(att3);
 				displayUpgrade(lblSlot3, att3, prevValue3, value3);
-				break;
-			case 4:
+			}
+			case 4 -> {
 				prevValue4 = value4;
 				value4 += artifact.generateValue(att4);
 				displayUpgrade(lblSlot4, att4, prevValue4, value4);
-				break;
+			}
 		}
 		upgradeCounter--;
 	}

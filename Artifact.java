@@ -172,15 +172,6 @@ public final class Artifact extends Attribute {
 			new Stat(Attribute.CRIT_DMG, 6.82)
 	);
 	
-	public static String generateRandomPiece() {
-		List<String> listPiece = Arrays.asList(
-				Artifact.FLOWER, Artifact.FEATHER, Artifact.SANDS,
-				Artifact.GOBLET, Artifact.CIRCLET
-		);
-		
-		int randomIndex = new Random().nextInt(listPiece.size());
-		return listPiece.get(randomIndex);
-	}
 	
 	public String[] getPiece() {
 		return PIECE;
@@ -206,17 +197,27 @@ public final class Artifact extends Attribute {
 		return CIRCLET_OF_LOGOS;
 	}
 	
+	public String generateRandomPiece() {
+		List<String> listPiece = Arrays.asList(
+				FLOWER, FEATHER, SANDS,
+				GOBLET, CIRCLET
+		);
+		
+		int randomIndex = new Random().nextInt(listPiece.size());
+		return listPiece.get(randomIndex);
+	}
+	
 	public String generateMainAttribute(String artifactPiece) throws IllegalArgumentException {
 		return switch(artifactPiece) {
-			case Artifact.FLOWER ->
+			case FLOWER ->
 				listFlower.get(0).getAttribute();
-			case Artifact.FEATHER ->
+			case FEATHER ->
 				listFeather.get(0).getAttribute();
-			case Artifact.SANDS ->
+			case SANDS ->
 				generatedAttribute(listSands);
-			case Artifact.GOBLET ->
+			case GOBLET ->
 				generatedAttribute(listGoblet);
-			case Artifact.CIRCLET ->
+			case CIRCLET ->
 				generatedAttribute(listCirclet);
 			default ->
 				// Throw an exception if none of the cases is met
@@ -259,7 +260,7 @@ public final class Artifact extends Attribute {
 		
 		int[] maxUpgrades = { 4, 5 };
 		
-		if (noOfSubStatChance < 50.00) {
+		if (noOfSubStatChance <= 50.00) {
 			return maxUpgrades[0];
 		} else {
 			return maxUpgrades[1];
@@ -273,9 +274,9 @@ public final class Artifact extends Attribute {
 		double[] probabilities = { 23.73, 39.55, 26.37, 8.79, 1.46, 0.10 };
 		double cumulativeProbability = 0;
 		
-		for(int i = 0; i < upgradeTimes.length; i++) {
+		for(int i = 0; i <= upgradeTimes.length; i++) {
 			cumulativeProbability += probabilities[i];
-			if(upgradeChance < cumulativeProbability) {
+			if(upgradeChance <= cumulativeProbability) {
 				return upgradeTimes[i];
 			}
 		}
@@ -369,7 +370,7 @@ public final class Artifact extends Attribute {
 		
 		for(int i = 0; i < listAttribute.size(); i++) {
 			cumulativeProbability += listAttribute.get(i).getProbability();
-			if(attributeChance < cumulativeProbability) {
+			if(attributeChance <= cumulativeProbability) {
 				return listAttribute.get(i).getAttribute();
 			}
 		}
@@ -388,7 +389,7 @@ public final class Artifact extends Attribute {
 		
 		for(int i = 0; i < attributeValue.length; i++) {
 			cumulativeProbability += probabilities[i];
-			if(valueChance < cumulativeProbability) {
+			if(valueChance <= cumulativeProbability) {
 				return attributeValue[i];
 			}
 		}
@@ -398,8 +399,10 @@ public final class Artifact extends Attribute {
 	}
 	
 	// NUMBER GENERATOR
-	// Generates number from 0.00 to 99.999999999999...
+	// Generates number from 0.00 to 100.00
 	public double generateNumber() {
-	    return new Random().nextDouble() * 100;
+		int min = 0;
+		int max = 100;
+		return Double.valueOf("%.2f".formatted(new Random().nextDouble() * (max - min) + min));
 	}
 }

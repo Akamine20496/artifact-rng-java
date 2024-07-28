@@ -75,7 +75,7 @@ public class Custom_Stat extends JDialog {
 		setResizable(false);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Custom_Stat.class.getResource("/assets/Amber Icon.jpg")));
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setTitle("Setup Stat");
+		setTitle("Setup Custom Stat");
 		setModal(true);
 		setSize(564, 340);
 		getContentPane().setLayout(new BorderLayout(0, 0));
@@ -224,7 +224,7 @@ public class Custom_Stat extends JDialog {
 					cboValue2.setModel(modelDefaultValue);
 					cboValue3.setModel(modelDefaultValue);
 					cboValue4.setModel(modelDefaultValue);
-					JOptionPane.showMessageDialog(contentPane, "Substats are removed!");
+					JOptionPane.showMessageDialog(contentPane, "Sub-stats are removed!");
 				}
 			}
 		});
@@ -237,8 +237,19 @@ public class Custom_Stat extends JDialog {
 							JOptionPane.showMessageDialog(contentPane, "Slots are empty!");
 				} else {
 					do {
-						String result = JOptionPane.showInputDialog(contentPane, "Enter the number to remove a sub-stat and click 'OK'\n" 
-								+ "[1] Slot 1\n[2] Slot 2\n[3] Slot 3\n[4] Slot 4", "Remove Substat", JOptionPane.PLAIN_MESSAGE);
+								
+						String message = """
+								<html>
+									Enter the number to remove a sub-stat and click '<b>OK</b>'
+									<br> <br>
+									<b>[1]</b> Slot 1 (%s) <br>
+									<b>[2]</b> Slot 2 (%s) <br>
+									<b>[3]</b> Slot 3 (%s) <br>
+									<b>[4]</b> Slot 4 (%s) <br>
+								</html>
+						""".formatted(lblAtt1.getText(), lblAtt2.getText(), lblAtt3.getText(), lblAtt4.getText());
+						
+						String result = JOptionPane.showInputDialog(contentPane, message, "Remove Sub-Stat", JOptionPane.PLAIN_MESSAGE);
 						
 						if((result != null) && (result.length() > 0)) {
 							switch (result) {
@@ -282,8 +293,20 @@ public class Custom_Stat extends JDialog {
 						do {
 							String attribute = listAttributes.getSelectedValue();
 							
-							String result = JOptionPane.showInputDialog(contentPane, "Enter the number to add a sub-stat and click 'OK'\n"
-									+ "[1] Slot 1\n[2] Slot 2\n[3] Slot 3\n[4] Slot 4", "Add Substat", JOptionPane.PLAIN_MESSAGE);
+							String message = """
+									<html>
+										Enter the number to add a sub-stat and click '<b>OK</b>'
+										<br> <br>
+										Selected Sub-Stat: <b>%s</b>
+										<br> <br>
+										<b>[1]</b> Slot 1 (%s) <br>
+										<b>[2]</b> Slot 2 (%s) <br>
+										<b>[3]</b> Slot 3 (%s) <br>
+										<b>[4]</b> Slot 4 (%s) <br>
+									</html>
+							""".formatted(attribute, lblAtt1.getText(), lblAtt2.getText(), lblAtt3.getText(), lblAtt4.getText());
+							
+							String result = JOptionPane.showInputDialog(contentPane, message, "Add Sub-Stat", JOptionPane.PLAIN_MESSAGE);
 							
 							if((result != null) && (result.length() > 0)) {
 								if(attribute.equals(lblAtt1.getText()) || attribute.equals(lblAtt2.getText())
@@ -379,8 +402,8 @@ public class Custom_Stat extends JDialog {
 				} else {
 					isSaved = true;
 					displayStats();
-					JOptionPane.showMessageDialog(contentPane, "Stats has been displayed!");
 					dispose();
+					JOptionPane.showMessageDialog(contentPane, "Stats has been displayed!");
 				}
 			}
 		});

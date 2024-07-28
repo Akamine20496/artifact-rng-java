@@ -101,7 +101,7 @@ public class Artifact_Simulator extends JFrame {
 		btnGenerate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (isLock && chkRandomStat.isSelected()) {
-					panelArtifactPiece.setArtifactPiece(Artifact.generateRandomPiece());
+					panelArtifactPiece.setArtifactPiece(new Artifact().generateRandomPiece());
 					panelArtifactPiece.generateStat();
 					
 					maxUpgrade = panelArtifactPiece.getMaxUpgrade();
@@ -315,6 +315,7 @@ public class Artifact_Simulator extends JFrame {
 		panelControls.add(btnSkip);
 		
 		chkRandomStat = new JCheckBox("Random Stat");
+		chkRandomStat.setHorizontalAlignment(SwingConstants.CENTER);
 		chkRandomStat.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (chkRandomStat.isSelected()) {
@@ -330,6 +331,7 @@ public class Artifact_Simulator extends JFrame {
 		panelControls.add(chkRandomStat);
 		
 		chkFullUpgrade = new JCheckBox("Full Upgrade");
+		chkFullUpgrade.setHorizontalAlignment(SwingConstants.CENTER);
 		chkFullUpgrade.setEnabled(false);
 		chkFullUpgrade.setFont(new Font("Segoe UI", Font.BOLD, 11));
 		chkFullUpgrade.setBounds(170, 290, 113, 23);
@@ -371,7 +373,7 @@ public class Artifact_Simulator extends JFrame {
 			<html>
 				<style>
 					* {
-						font-family: SegoeUI;
+						font-family: 'Segoe UI';
 					}
 					
 					.container {
@@ -435,6 +437,9 @@ public class Artifact_Simulator extends JFrame {
 						</ul>
 					</p> <br>
 					<p>
+						These flags only works if it's "Unlock". Otherwise, it will not work if it's "Lock".
+					</p> <br>
+					<p>
 						Occasionally, it may display incorrect decimals due to rounding errors.
 					</p> <br>
 					<p class='text-center'>
@@ -450,7 +455,7 @@ public class Artifact_Simulator extends JFrame {
 			<html>
 				<style>
 					* {
-						font-family: SegoeUI;
+						font-family: 'Segoe UI';
 					}
 					
 					.container {
