@@ -340,4 +340,18 @@ public class Artifact_Piece extends JPanel {
 	public int getMaxUpgrade() {
 		return maxUpgrade;
 	}
+	
+	@Override
+	public String toString() {
+		return """
+				Artifact_Piece{artifactPiece=%s,mainAttribute=%s,att1=%s,value1=%.2f,att2=%s,value2=%.2f,att3=%s,value3=%.2f,att4=%s,value4=%.2f}
+				""".formatted(
+						artifactPiece,
+						mainAttribute,
+						att1, iValue1,
+						att2, iValue2,
+						att3, iValue3,
+						att4, iValue4
+				);
+	}
 }

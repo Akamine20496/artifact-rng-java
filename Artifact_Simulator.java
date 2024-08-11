@@ -242,7 +242,6 @@ public class Artifact_Simulator extends JFrame {
 				customStat.setVisible(true);
 				
 				if(Custom_Stat.isSaved()) {
-					panelArtifactPiece.generateStat();
 					maxUpgrade = panelArtifactPiece.getMaxUpgrade();
 					lblStatus.setText("Max Upgrade : " + maxUpgrade);
 					

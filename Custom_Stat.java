@@ -52,7 +52,7 @@ public class Custom_Stat extends JDialog {
 	private JButton btnRemoveAll;
 	private JButton btnDisplay;
 	private JPanel contentPane;
-	private static boolean isSaved = false;
+	private static boolean isSaved;
 	
 	/**
 	 * Create the dialog.
@@ -64,13 +64,6 @@ public class Custom_Stat extends JDialog {
 				| UnsupportedLookAndFeelException e1) {
 			e1.printStackTrace();
 		}
-		
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosed(WindowEvent e) {
-				isSaved = false;
-			}
-		});
 		
 		setResizable(false);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Custom_Stat.class.getResource("/assets/Amber Icon.jpg")));
@@ -174,8 +167,8 @@ public class Custom_Stat extends JDialog {
 		listAttributes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane.setViewportView(listAttributes);
 		
-		lblListHeader = new JLabel("SUB STATS");
-		lblListHeader.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		lblListHeader = new JLabel("SUB-STAT LIST");
+		lblListHeader.setFont(new Font("Segoe UI", Font.BOLD, 11));
 		lblListHeader.setHorizontalAlignment(SwingConstants.CENTER);
 		scrollPane.setColumnHeaderView(lblListHeader);
 		
@@ -200,7 +193,7 @@ public class Custom_Stat extends JDialog {
 		btnRemoveAll.setBounds(393, 197, 125, 30);
 		panelSetup.add(btnRemoveAll);
 		
-		JLabel lblText3 = new JLabel("STAT DETAILS");
+		JLabel lblText3 = new JLabel("SUB-STATS");
 		lblText3.setFont(new Font("Segoe UI", Font.BOLD, 12));
 		lblText3.setBounds(258, 11, 90, 23);
 		panelSetup.add(lblText3);
@@ -344,16 +337,16 @@ public class Custom_Stat extends JDialog {
 						} while(!isAdded);
 						listAttributes.clearSelection(); // clears the list selection
 					} else {
-						JOptionPane.showMessageDialog(contentPane, "Select a substat to add!");
+						JOptionPane.showMessageDialog(contentPane, "Select a sub-stat to add!");
 					}
 				}
 			}
 		});
 		cboArtifactPiece.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
-				String selectedItem = (String) cboArtifactPiece.getSelectedItem();
+				String selectedPiece = (String) cboArtifactPiece.getSelectedItem();
 				
-				cboMainStat.setModel(switch(selectedItem) {
+				cboMainStat.setModel(switch(selectedPiece) {
 					case Artifact.FLOWER ->
 						new DefaultComboBoxModel<>(artifact.getFlower());
 					case Artifact.FEATHER ->
@@ -365,7 +358,7 @@ public class Custom_Stat extends JDialog {
 					case Artifact.CIRCLET ->
 						new DefaultComboBoxModel<>(artifact.getCirclet());
 					default ->
-						throw new IllegalArgumentException("Unexpected item: " + selectedItem);
+						throw new IllegalArgumentException("Unexpected piece: " + selectedPiece);
 				});
 			}
 		});
@@ -387,7 +380,7 @@ public class Custom_Stat extends JDialog {
 					}
 				}
 
-				lblListHeader.setText("SUB STATS (" + mainStat + ")");
+				lblListHeader.setText("SUB-STAT LIST (" + mainStat + ")");
 			}
 		});
 		btnDisplay.addActionListener(new ActionListener() {
@@ -403,6 +396,7 @@ public class Custom_Stat extends JDialog {
 					isSaved = true;
 					displayStats();
 					dispose();
+					objArtifactPiece = null;
 					JOptionPane.showMessageDialog(contentPane, "Stats has been displayed!");
 				}
 			}
@@ -486,6 +480,7 @@ public class Custom_Stat extends JDialog {
 		objArtifactPiece.setMainAttribute(mainAttribute);
 		objArtifactPiece.setSlot(att1, att2, att3, att4);
 		objArtifactPiece.setValue(value1, value2, value3, value4);
+		objArtifactPiece.generateStat();
 	}
 	
 	public static boolean isSaved() {
