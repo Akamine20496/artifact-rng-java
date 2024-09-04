@@ -112,8 +112,6 @@ public class ArtifactPiece extends JPanel {
 	}
 
 	public void generateRandomCustomSubStat() {
-		System.out.println("Random Custom Substat Reached");
-		
 		maxUpgrade = artifact.generateMaxUpgrade();
 
 		do {
@@ -134,8 +132,6 @@ public class ArtifactPiece extends JPanel {
 
 		isGenerated = false;
 		displayStat();
-
-		System.out.println("Random Custom Substat Done");
 	}
 
 	private void displayStat() {

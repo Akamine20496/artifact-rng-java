@@ -59,7 +59,7 @@ public class ArtifactSimulator extends JFrame {
 					
 					InstructionDialog.showMessageDialog(frame, frame.getTitle(), frame.displayArtifactSimulatorMessage());
 				} catch (Exception e) {
-					JOptionPane.showMessageDialog(frame != null ? frame : null, e.getMessage(), "Oops!", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(frame != null ? frame : null, e.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -247,7 +247,7 @@ public class ArtifactSimulator extends JFrame {
 					CustomStat customStat = new CustomStat(frameAncestor, panelArtifactPiece);
 					customStat.setVisible(true);
 					
-					if(CustomStat.getIsDisplayed()) {
+					if(CustomStat.getIsCustomStatDisplayed()) {
 						maxUpgrade = panelArtifactPiece.getMaxUpgrade();
 						lblStatus.setText("Max Upgrade : " + maxUpgrade);
 						

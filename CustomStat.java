@@ -33,10 +33,12 @@ import java.awt.event.KeyEvent;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JCheckBox;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class CustomStat extends JDialog {
 	private static String title = "Setup Custom Stat";
-	private static boolean isDisplayed;
+	private static boolean isCustomStatDisplayed;
 	
 	private Artifact artifact = new Artifact();
 	private ArtifactPiece objArtifactPiece;
@@ -69,6 +71,7 @@ public class CustomStat extends JDialog {
 	 */
 	public CustomStat(Frame owner, ArtifactPiece objArtifactPiece) {
 		super(owner, title, true);
+		
 		this.objArtifactPiece = objArtifactPiece;
 		
 		setLookAndFeel();
@@ -80,6 +83,12 @@ public class CustomStat extends JDialog {
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(CustomStat.class.getResource("/assets/Amber Icon.jpg")));
 		getRootPane().setDefaultButton(btnDisplay);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				isCustomStatDisplayed = false;
+			}
+		});
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -144,7 +153,7 @@ public class CustomStat extends JDialog {
 		                        	if (!isCancelled()) {
 		                        		get();
 		                        		
-		                        		isDisplayed = true;
+		                        		isCustomStatDisplayed = true;
 		                        		JOptionPane.showMessageDialog(contentPane, "Stats have been displayed!");
 		                        		dispose();
 		                        	}		                        	
@@ -655,8 +664,8 @@ public class CustomStat extends JDialog {
         }
 	}
 	
-	public static boolean getIsDisplayed() {
-		return isDisplayed;
+	public static boolean getIsCustomStatDisplayed() {
+		return isCustomStatDisplayed;
 	}
 	
 	private boolean isNone(String text) {
