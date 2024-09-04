@@ -208,7 +208,7 @@ public final class Artifact extends Attribute {
 	}
 	
 	public String generateMainAttribute(String artifactPiece) throws IllegalArgumentException {
-		return switch(artifactPiece) {
+		return switch (artifactPiece) {
 			case FLOWER ->
 				listFlower.get(0).getAttribute();
 			case FEATHER ->
@@ -227,7 +227,7 @@ public final class Artifact extends Attribute {
 	
 	public String generateSubAttribute(String mainAttribute) throws IllegalArgumentException {
 		if(isNotSpecial(mainAttribute)) {
-			return switch(mainAttribute) {
+			return switch (mainAttribute) {
 				case Attribute.HP_FLAT ->
 					generatedAttribute(listHpFlat);
 	    		case Attribute.ATK_FLAT ->
@@ -255,7 +255,7 @@ public final class Artifact extends Attribute {
 		}
 	}
 	
-	public int noOfMaxUpgrade() {
+	public int generateMaxUpgrade() {
 		double noOfSubStatChance = generateNumber();
 		
 		int[] maxUpgrades = { 4, 5 };
@@ -267,7 +267,7 @@ public final class Artifact extends Attribute {
 		}
 	}
 	
-	public int noOfUpgrade() {
+	public int generateNoOfUpgrade() {
 		double upgradeChance = generateNumber();
 		
 		int[] upgradeTimes = { 0, 1, 2, 3, 4, 5 };
@@ -286,6 +286,9 @@ public final class Artifact extends Attribute {
 	}
 	
 	public double generateValue(String attribute) throws IllegalArgumentException {
+		if (attribute == null) {
+			throw new NullPointerException("attribute must not be null");
+		}
 		// "ATK%", "HP%", "DEF%", "ATK", "HP", "DEF", "Energy Recharge", "Elemental Mastery", "Crit Rate", "Crit Damage"
 		
 		/*
@@ -309,6 +312,10 @@ public final class Artifact extends Attribute {
 	}
 	
 	public String formatText(String attribute) {
+		if (attribute == null) {
+			throw new NullPointerException("attribute must not be null");
+		}
+		
 		// checks if the attribute is percentage
 		if(attribute.substring(attribute.length() - 1).equals("%")) {
 			return attribute.substring(0, attribute.length() - 1);
@@ -319,6 +326,10 @@ public final class Artifact extends Attribute {
 	}
 	
 	public String formatText(String attribute, double value) {
+		if (attribute == null) {
+			throw new NullPointerException("attribute must not be null");
+		}
+		
 		// checks if the attribute is percentage
 		if(attribute.substring(attribute.length() - 1).equals("%")) {
 			String modifiedAtt = attribute.substring(0, attribute.length() - 1);
@@ -330,6 +341,10 @@ public final class Artifact extends Attribute {
 	}
 	
 	public String formatText(String attribute, double prevValue, double currValue) {
+		if (attribute == null) {
+			throw new NullPointerException("attribute must not be null");
+		}
+		
 		// checks if the attribute is percentage
 		if(attribute.substring(attribute.length() - 1).equals("%")) {
 			String modifiedAtt = attribute.substring(0, attribute.length() - 1);
@@ -341,6 +356,10 @@ public final class Artifact extends Attribute {
 	}
 	
 	public String formatValue(String attribute, double value) {
+		if (attribute == null) {
+			throw new NullPointerException("attribute must not be null");
+		}
+		
 		// checks if the attribute is percentage
 		if(attribute.substring(attribute.length() - 1).equals("%")) {
 			return String.format("%.1f", value) + "%";
