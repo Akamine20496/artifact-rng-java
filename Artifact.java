@@ -260,7 +260,7 @@ public final class Artifact extends Attribute {
 		
 		int[] maxUpgrades = { 4, 5 };
 		
-		if (noOfSubStatChance <= 50.00) {
+		if (noOfSubStatChance <= 66.00) {
 			return maxUpgrades[0];
 		} else {
 			return maxUpgrades[1];
@@ -268,10 +268,10 @@ public final class Artifact extends Attribute {
 	}
 	
 	public int generateNoOfUpgrade() {
-		double upgradeChance = generateNumber();
+		double upgradeChance = Double.valueOf("%.2f".formatted(generateNumber() - 0.01));
 		
 		int[] upgradeTimes = { 0, 1, 2, 3, 4, 5 };
-		double[] probabilities = { 23.73, 39.55, 26.37, 8.79, 1.46, 0.10 };
+		double[] probabilities = { 23.73, 39.55, 26.37, 8.79, 1.46, 0.09 };
 		double cumulativeProbability = 0;
 		
 		for(int i = 0; i <= upgradeTimes.length; i++) {

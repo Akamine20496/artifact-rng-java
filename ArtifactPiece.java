@@ -37,25 +37,25 @@ public class ArtifactPiece extends JPanel {
 		setBounds(332, 11, 231, 328);
 		setLayout(null);
 
-		lblSlot1 = new JLabel(displayDefaultValue());
+		lblSlot1 = new JLabel(displayNoneSubStat());
 		lblSlot1.setForeground(new Color(40, 40, 40));
 		lblSlot1.setFont(new Font("Microsoft YaHei UI", Font.BOLD, 13));
 		lblSlot1.setBounds(10, 134, 211, 30);
 		add(lblSlot1);
 
-		lblSlot2 = new JLabel(displayDefaultValue());
+		lblSlot2 = new JLabel(displayNoneSubStat());
 		lblSlot2.setForeground(new Color(40, 40, 40));
 		lblSlot2.setFont(new Font("Microsoft YaHei UI", Font.BOLD, 13));
 		lblSlot2.setBounds(10, 175, 211, 30);
 		add(lblSlot2);
 
-		lblSlot3 = new JLabel(displayDefaultValue());
+		lblSlot3 = new JLabel(displayNoneSubStat());
 		lblSlot3.setForeground(new Color(40, 40, 40));
 		lblSlot3.setFont(new Font("Microsoft YaHei UI", Font.BOLD, 13));
 		lblSlot3.setBounds(10, 216, 211, 30);
 		add(lblSlot3);
 
-		lblSlot4 = new JLabel(displayDefaultValue());
+		lblSlot4 = new JLabel(displayNoneSubStat());
 		lblSlot4.setForeground(new Color(40, 40, 40));
 		lblSlot4.setFont(new Font("Microsoft YaHei UI", Font.BOLD, 13));
 		lblSlot4.setBounds(10, 257, 211, 30);
@@ -83,9 +83,9 @@ public class ArtifactPiece extends JPanel {
 		lblArtifactPiece.setBackground(Color.BLACK);
 	}
 
-	public void generateStat() {
+	public void generateStats() {
 		if (mainAttribute != null) {
-			displayStat();
+			displayStats();
 			return;
 		}
 
@@ -108,14 +108,14 @@ public class ArtifactPiece extends JPanel {
 		} while (!isGenerated);
 
 		isGenerated = false;
-		displayStat();
+		displayStats();
 	}
 
-	public void generateRandomCustomSubStat() {
+	public void generateRandomCustomSubStats() {
 		maxUpgrade = artifact.generateMaxUpgrade();
 
 		do {
-			att3 = att3 != null ? att3 : artifact.generateSubAttribute(mainAttribute);
+			att3 = artifact.generateSubAttribute(mainAttribute);
 			att4 = maxUpgrade == 4 ? null : artifact.generateSubAttribute(mainAttribute);
 
 			if (artifact.isUnique(att1, att2, att3, att4)) {
@@ -124,24 +124,24 @@ public class ArtifactPiece extends JPanel {
 					iValue2 = value2 = artifact.generateValue(att2);
 				}
 
-				iValue3 = value3 = iValue3 != 0 ? iValue3 : artifact.generateValue(att3);
+				iValue3 = value3 = artifact.generateValue(att3);
 				iValue4 = value4 = maxUpgrade == 4 ? 0 : artifact.generateValue(att4);
 				isGenerated = true;
 			}
 		} while (!isGenerated);
 
 		isGenerated = false;
-		displayStat();
+		displayStats();
 	}
 
-	private void displayStat() {
+	private void displayStats() {
 		lblArtifactPiece.setText(artifactPiece);
 		lblMainAttribute.setText(mainAttribute);
 
 		lblSlot1.setText(displayText(att1, value1));
 		lblSlot2.setText(displayText(att2, value2));
 		lblSlot3.setText(displayText(att3, value3));
-		lblSlot4.setText(maxUpgrade != 4 ? displayText(att4, value4) : displayDefaultValue());
+		lblSlot4.setText(maxUpgrade != 4 ? displayText(att4, value4) : displayNoneSubStat());
 	}
 
 	public void rerollStat() {
@@ -157,7 +157,7 @@ public class ArtifactPiece extends JPanel {
 		lblSlot1.setText(displayText(att1, value1));
 		lblSlot2.setText(displayText(att2, value2));
 		lblSlot3.setText(displayText(att3, value3));
-		lblSlot4.setText(maxUpgrade != 4 ? displayText(att4, value4) : displayDefaultValue());
+		lblSlot4.setText(maxUpgrade != 4 ? displayText(att4, value4) : displayNoneSubStat());
 
 		slotNumber = 0;
 		upgradeCounter = 0;
@@ -185,38 +185,38 @@ public class ArtifactPiece extends JPanel {
 		isGenerated = false;
 	}
 
-	public void upgradeValue() {
+	public void upgradeSubStatValue() {
 		if (att4 == null) {
 			generateFourthSubStat();
 		} else {
-			if (!isMax) { // if the total upgrades of 5 or 4 is reached
-				if (upgradeCounter == 0) { // if the counter is 0, it will loop
-					while (upgradeCounter == 0) { // until the upgrade counter is not 0
-						slotNumber = selectSlot();
+			if (!isMax) { 													// if the total upgrades of 5 or 4 is reached
+				if (upgradeCounter == 0) { 									// if the counter is 0, it will loop
+					while (upgradeCounter == 0) { 							// until the upgrade counter is not 0
+						slotNumber = generateRandomSlot();
 						upgradeCounter = artifact.generateNoOfUpgrade();
 						totalUpgrade += upgradeCounter;
 					}
 
-					if (totalUpgrade == maxUpgrade) { // if the total upgrade reaches 5 or 4, set the isMax to true
-						isMax = true; // and upgrade the value
-						slot(slotNumber);
-					} else if (totalUpgrade > maxUpgrade) { // if the total upgrade exceeds 5 or 4, deduct it from counter
-						totalUpgrade -= upgradeCounter; // and set the counter to 0, then retry the process
+					if (totalUpgrade == maxUpgrade) { 						// if the total upgrade reaches 5 or 4, set the isMax to true
+						isMax = true; 										// and upgrade the value
+						selectSlot(slotNumber);
+					} else if (totalUpgrade > maxUpgrade) { 				// if the total upgrade exceeds 5 or 4, deduct it from counter
+						totalUpgrade -= upgradeCounter; 					// and set the counter to 0, then retry the process
 						upgradeCounter = 0;
-						upgradeValue();
+						upgradeSubStatValue();
 					} else {
-						slot(slotNumber); // if the total upgrade is not 5
+						selectSlot(slotNumber); 							// if the total upgrade is not 5
 					}
 				} else {
-					slot(slotNumber); // if the counter is not 0
+					selectSlot(slotNumber); 								// if the counter is not 0
 				}
 			} else {
-				slot(slotNumber); // if the isMax is true
+				selectSlot(slotNumber); 									// if the isMax is true
 			}
 		}
 	}
 
-	private int selectSlot() {
+	private int generateRandomSlot() {
 		double slotChance = artifact.generateNumber();
 
 		int[] slots = { 1, 2, 3, 4 };
@@ -225,7 +225,7 @@ public class ArtifactPiece extends JPanel {
 
 		for (int i = 0; i < slots.length; i++) {
 			cumulativeProbability += probabilities[i];
-			if (slotChance < cumulativeProbability) {
+			if (slotChance <= cumulativeProbability) {
 				return slots[i];
 			}
 		}
@@ -234,33 +234,34 @@ public class ArtifactPiece extends JPanel {
 		return slots[0];
 	}
 
-	private void slot(int slotNumber) {
+	private void selectSlot(int slotNumber) {
 		switch (slotNumber) {
 			case 1 -> {
 				prevValue1 = value1;
 				value1 += artifact.generateValue(att1);
-				displayUpgrade(lblSlot1, att1, prevValue1, value1);
+				displaySubStatUpgrade(lblSlot1, att1, prevValue1, value1);
 			}
 			case 2 -> {
 				prevValue2 = value2;
 				value2 += artifact.generateValue(att2);
-				displayUpgrade(lblSlot2, att2, prevValue2, value2);
+				displaySubStatUpgrade(lblSlot2, att2, prevValue2, value2);
 			}
 			case 3 -> {
 				prevValue3 = value3;
 				value3 += artifact.generateValue(att3);
-				displayUpgrade(lblSlot3, att3, prevValue3, value3);
+				displaySubStatUpgrade(lblSlot3, att3, prevValue3, value3);
 			}
 			case 4 -> {
 				prevValue4 = value4;
 				value4 += artifact.generateValue(att4);
-				displayUpgrade(lblSlot4, att4, prevValue4, value4);
+				displaySubStatUpgrade(lblSlot4, att4, prevValue4, value4);
 			}
 		}
+		
 		upgradeCounter--;
 	}
 
-	private void displayUpgrade(JLabel lblSlot, String att, double prevValue, double currValue) {
+	private void displaySubStatUpgrade(JLabel lblSlot, String att, double prevValue, double currValue) {
 		lblSlot.setText(displayText(att, currValue));
 
 		if (!skipMode) {
@@ -269,14 +270,14 @@ public class ArtifactPiece extends JPanel {
 		}
 	}
 
-	public void resetStat() {
+	public void resetStats() {
 		lblArtifactPiece.setText("None");
 		lblMainAttribute.setText("None");
 
-		lblSlot1.setText(displayDefaultValue());
-		lblSlot2.setText(displayDefaultValue());
-		lblSlot3.setText(displayDefaultValue());
-		lblSlot4.setText(displayDefaultValue());
+		lblSlot1.setText(displayNoneSubStat());
+		lblSlot2.setText(displayNoneSubStat());
+		lblSlot3.setText(displayNoneSubStat());
+		lblSlot4.setText(displayNoneSubStat());
 
 		slotNumber = 0;
 		upgradeCounter = 0;
@@ -302,7 +303,7 @@ public class ArtifactPiece extends JPanel {
 			String s1, s2, s3, s4;
 
 			for (int counter = 1; counter <= 5; counter++) {
-				upgradeValue();
+				upgradeSubStatValue();
 			}
 
 			s1 = artifact.formatText(att1, iValue1, value1);
@@ -318,7 +319,7 @@ public class ArtifactPiece extends JPanel {
 		}
 	}
 
-	private String displayDefaultValue() {
+	private String displayNoneSubStat() {
 		return "· None";
 	}
 
@@ -370,7 +371,7 @@ public class ArtifactPiece extends JPanel {
 			ArtifactPiece {
 				artifactPiece	= %s
 				mainAttribute	= %s
-				noOfMaxUpgrade	= %d
+				maxUpgrade		= %d
 				att1 = %s [iValue1 = %.2f, value1 = %.2f]
 				att2 = %s [iValue2 = %.2f, value2 = %.2f]
 				att3 = %s [iValue4 = %.2f, value3 = %.2f]

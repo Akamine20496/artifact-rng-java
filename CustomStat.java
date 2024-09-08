@@ -119,6 +119,7 @@ public class CustomStat extends JDialog {
 													* Slot 1 to 3 are filled or Slot 1 to 4 are filled
 													
 												Cannot display stats if
+													* All Slots are empty
 													* Slot 1 and Slot 2 are empty but Slot 3 and Slot 4 are filled
 											""";
 							
@@ -139,7 +140,7 @@ public class CustomStat extends JDialog {
 		                    		return null;
 		                    	}
 		                    	
-		                    	displayStats();
+		                    	displayCustomStats();
 		                    	
 		                        return null;
 		                    }
@@ -633,12 +634,12 @@ public class CustomStat extends JDialog {
 		});
 	}
 	
-	public void displayStats() {
+	public void displayCustomStats() {
 		String artifactPiece = (String) cboArtifactPiece.getSelectedItem();
         String mainAttribute = (String) cboMainStat.getSelectedItem();
 
-        String att1 = lblAtt1.getText().equals("None") ? null : lblAtt1.getText();
-        String att2 = lblAtt2.getText().equals("None") ? null : lblAtt2.getText();
+        String att1 = lblAtt1.getText();
+        String att2 = lblAtt2.getText();
         String att3 = lblAtt3.getText().equals("None") ? null : lblAtt3.getText();
         String att4 = lblAtt4.getText().equals("None") ? null : lblAtt4.getText();
 
@@ -652,15 +653,15 @@ public class CustomStat extends JDialog {
         objArtifactPiece.setAttribute(att1, att2, att3, att4);
         objArtifactPiece.setValue(value1, value2, value3, value4);
 
-        if ((att1 != null && att2 != null) && att3 == null) {
-            objArtifactPiece.generateRandomCustomSubStat();
+        if ((att1 != null && att2 != null) && (att3 == null || definedAffixMode)) {
+            objArtifactPiece.generateRandomCustomSubStats();
         } else {
             if (att4 == null) {
                 objArtifactPiece.setMaxUpgrade(4);
             } else {
                 objArtifactPiece.setMaxUpgrade(5);
             }
-            objArtifactPiece.generateStat();
+            objArtifactPiece.generateStats();
         }
 	}
 	

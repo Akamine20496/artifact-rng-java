@@ -59,8 +59,8 @@ public sealed class Attribute permits Artifact {
 	};
 	
 	public boolean isNotSpecial(String attribute) {
-		for(String attributes : ATTRIBUTES) {
-			if(attributes.equals(attribute)) {
+		for(String currAttribute : ATTRIBUTES) {
+			if(currAttribute.equals(attribute)) {
 				return true;
 			}
 		}

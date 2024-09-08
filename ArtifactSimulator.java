@@ -109,7 +109,7 @@ public class ArtifactSimulator extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (isLock && chkRandomStat.isSelected()) {
 					panelArtifactPiece.setArtifactPiece(new Artifact().generateRandomPiece());
-					panelArtifactPiece.generateStat();
+					panelArtifactPiece.generateStats();
 					
 					maxUpgrade = panelArtifactPiece.getMaxUpgrade();
 					lblStatus.setText("Max Upgrade : " + maxUpgrade);
@@ -136,7 +136,7 @@ public class ArtifactSimulator extends JFrame {
 				} else {
 					String selectedPiece = (String) cboArtifactPiece.getSelectedItem();
 					panelArtifactPiece.setArtifactPiece(selectedPiece);
-					panelArtifactPiece.generateStat();
+					panelArtifactPiece.generateStats();
 					
 					maxUpgrade = panelArtifactPiece.getMaxUpgrade();
 					lblStatus.setText("Max Upgrade : " + maxUpgrade);
@@ -171,7 +171,7 @@ public class ArtifactSimulator extends JFrame {
 				}
 				
 				lblStatus.setText("Max Upgrade : 0");
-				panelArtifactPiece.resetStat();
+				panelArtifactPiece.resetStats();
 				btnLock.setEnabled(true);
 				btnGenerate.setEnabled(true);
 				btnSkip.setEnabled(false);
@@ -197,10 +197,10 @@ public class ArtifactSimulator extends JFrame {
 				btnSkip.setEnabled(false);
 				
 				if(maxUpgrade == 4 && isNewSubStat) {
-					panelArtifactPiece.upgradeValue();
+					panelArtifactPiece.upgradeSubStatValue();
 					isNewSubStat = false;
 				} else if(rollCounter < maxUpgrade) {
-					panelArtifactPiece.upgradeValue();
+					panelArtifactPiece.upgradeSubStatValue();
 					rollCounter++;
 					
 					if(rollCounter == maxUpgrade) {
@@ -415,8 +415,8 @@ public class ArtifactSimulator extends JFrame {
 						are not needed.
 					</p>
 					<p>
-						<span class='emphasis'>Generate</span>: Displays the main stat selected by the 
-						user, artifact piece, and generates random sub-stats and their values.
+						<span class='emphasis'>Generate</span>: Displays the artifact piece selected by the 
+						user and generates random main stat (for sands, goblet, circlet piece) and sub-stats.
 					</p>
 					<p>
 						<span class='emphasis'>Roll</span>: Upgrades a random value of a sub-stat.
@@ -550,6 +550,7 @@ public class ArtifactSimulator extends JFrame {
 					<p>
 						<span class='emphasis'>Cannot display stats if</span>
 						<ul>
+							<li>All Slots are empty</li>
 							<li>Slot 1 and Slot 2 are empty but Slot 3 and Slot 4 are filled</li>
 						</ul>
 					</p> <br>
@@ -557,8 +558,9 @@ public class ArtifactSimulator extends JFrame {
 						<span class='emphasis'>Defined Affix Mode</span>
 						<p>
 							This mode works like the current verion of Genshin's version 5.0. You will have to 
-							choose <span class='emphasis'>artifact piece</span>, <span class='emphasis'>main stat</span>,
-							and <span class='emphasis'>2 sub-stats</span>. The rest will automatically generate.
+							choose <span class='emphasis'>artifact piece (for sands, goblet, circlet piece)</span>, 
+							<span class='emphasis'>main stat</span>, and <span class='emphasis'>2 sub-stats</span>. 
+							The rest will automatically generate.
 						</p>
 						<p>The catch is that you can't choose initial value, it will be automically generated as well.</p>
 					</p> <br>
