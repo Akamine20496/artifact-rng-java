@@ -1,4 +1,3 @@
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
@@ -62,8 +61,8 @@ public class InstructionDialog extends JDialog {
         cardPanelCount = cardPanel.getComponentCount();
 
         // Create buttons
-        btnNext = new JButton("Next");
-        btnBack = new JButton("Back");
+        btnNext = new JButton("Next >");
+        btnBack = new JButton("< Back");
         btnOk = new JButton("OK");
         btnOk.setVisible(false);
 
@@ -98,6 +97,13 @@ public class InstructionDialog extends JDialog {
         messageIndex++;
         if (messageIndex < cardPanelCount) {
         	updateButtonVisibility();
+        	
+        	if (messageIndex != cardPanelCount - 1) {
+        		btnNext.requestFocus(); 
+        	} else { 
+        		btnOk.requestFocus();
+        	}
+        		
             cardLayout.show(cardPanel, "Panel " + messageIndex);
         }
     }
@@ -106,6 +112,9 @@ public class InstructionDialog extends JDialog {
         if (messageIndex > 0) {
             messageIndex--;
             updateButtonVisibility();
+            
+            btnBack.requestFocus();
+            
             cardLayout.show(cardPanel, "Panel " + messageIndex);
         }
     }

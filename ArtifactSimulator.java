@@ -24,7 +24,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.JCheckBox;
 
 public class ArtifactSimulator extends JFrame {
-	private ArtifactPiece panelArtifactPiece = new ArtifactPiece();
+	private ArtifactDisplayerPanel objArtifactDisplayer = new ArtifactDisplayerPanel();
 	private Frame frameAncestor;
 	private JPanel contentPane;
 	private JComboBox<String> cboArtifactPiece;
@@ -82,7 +82,7 @@ public class ArtifactSimulator extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(null);
 		setContentPane(contentPane);
-		contentPane.add(panelArtifactPiece);
+		contentPane.add(objArtifactDisplayer);
 		frameAncestor = (Frame) SwingUtilities.getWindowAncestor(contentPane);
 		
 		panelControls = new JPanel();
@@ -108,10 +108,10 @@ public class ArtifactSimulator extends JFrame {
 		btnGenerate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (isLock && chkRandomStat.isSelected()) {
-					panelArtifactPiece.setArtifactPiece(new Artifact().generateRandomPiece());
-					panelArtifactPiece.generateStats();
+					objArtifactDisplayer.setArtifactPiece(new Artifact().generateRandomPiece());
+					objArtifactDisplayer.generateStats();
 					
-					maxUpgrade = panelArtifactPiece.getMaxUpgrade();
+					maxUpgrade = objArtifactDisplayer.getMaxUpgrade();
 					lblStatus.setText("Max Upgrade : " + maxUpgrade);
 					
 					cboArtifactPiece.setEnabled(false);
@@ -125,8 +125,10 @@ public class ArtifactSimulator extends JFrame {
 					chkRandomStat.setEnabled(false);
 					chkFullUpgrade.setEnabled(false);
 					
-					if (chkRandomStat.isSelected() && chkFullUpgrade.isSelected()) {						
-						btnSkip.doClick();
+					if (chkRandomStat.isSelected() && chkFullUpgrade.isSelected()) {
+						// Invoke btnSkip click event
+						ActionEvent event = new ActionEvent(btnSkip, ActionEvent.ACTION_PERFORMED, null);
+						btnSkip.getActionListeners()[0].actionPerformed(event);
 					} else {
 						JOptionPane.showMessageDialog(contentPane, "Stats has been generated!");
 						btnRoll.requestFocus();
@@ -135,10 +137,10 @@ public class ArtifactSimulator extends JFrame {
 					JOptionPane.showMessageDialog(contentPane, "Click the 'Lock' first.");
 				} else {
 					String selectedPiece = (String) cboArtifactPiece.getSelectedItem();
-					panelArtifactPiece.setArtifactPiece(selectedPiece);
-					panelArtifactPiece.generateStats();
+					objArtifactDisplayer.setArtifactPiece(selectedPiece);
+					objArtifactDisplayer.generateStats();
 					
-					maxUpgrade = panelArtifactPiece.getMaxUpgrade();
+					maxUpgrade = objArtifactDisplayer.getMaxUpgrade();
 					lblStatus.setText("Max Upgrade : " + maxUpgrade);
 					
 					btnGenerate.setEnabled(false);
@@ -171,7 +173,7 @@ public class ArtifactSimulator extends JFrame {
 				}
 				
 				lblStatus.setText("Max Upgrade : 0");
-				panelArtifactPiece.resetStats();
+				objArtifactDisplayer.resetStats();
 				btnLock.setEnabled(true);
 				btnGenerate.setEnabled(true);
 				btnSkip.setEnabled(false);
@@ -193,14 +195,14 @@ public class ArtifactSimulator extends JFrame {
 		btnRoll.setBounds(111, 161, 90, 30);
 		btnRoll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				panelArtifactPiece.setSkipMode(false);
+				objArtifactDisplayer.setSkipMode(false);
 				btnSkip.setEnabled(false);
 				
 				if(maxUpgrade == 4 && isNewSubStat) {
-					panelArtifactPiece.upgradeSubStatValue();
+					objArtifactDisplayer.upgradeSubStatValue();
 					isNewSubStat = false;
 				} else if(rollCounter < maxUpgrade) {
-					panelArtifactPiece.upgradeSubStatValue();
+					objArtifactDisplayer.upgradeSubStatValue();
 					rollCounter++;
 					
 					if(rollCounter == maxUpgrade) {
@@ -220,7 +222,7 @@ public class ArtifactSimulator extends JFrame {
 		btnReroll.setBounds(170, 120, 113, 30);
 		btnReroll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				panelArtifactPiece.rerollStat();
+				objArtifactDisplayer.rerollStat();
 				btnSkip.setEnabled(true);
 				btnRoll.setEnabled(true);
 				btnReroll.setEnabled(false);
@@ -244,11 +246,11 @@ public class ArtifactSimulator extends JFrame {
 				}
 				
 				try {
-					CustomStat customStat = new CustomStat(frameAncestor, panelArtifactPiece);
+					CustomStatDialog customStat = new CustomStatDialog(frameAncestor, objArtifactDisplayer);
 					customStat.setVisible(true);
 					
-					if(CustomStat.getIsCustomStatDisplayed()) {
-						maxUpgrade = panelArtifactPiece.getMaxUpgrade();
+					if(CustomStatDialog.getIsCustomStatDisplayed()) {
+						maxUpgrade = objArtifactDisplayer.getMaxUpgrade();
 						lblStatus.setText("Max Upgrade : " + maxUpgrade);
 						
 						btnLock.setEnabled(false);
@@ -313,8 +315,8 @@ public class ArtifactSimulator extends JFrame {
 				btnReroll.setEnabled(true);
 				btnReroll.requestFocus();
 				
-				panelArtifactPiece.setSkipMode(true);
-				panelArtifactPiece.displaySkippedStats();
+				objArtifactDisplayer.setSkipMode(true);
+				objArtifactDisplayer.displaySkippedStats();
 			}
 		});
 		btnSkip.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -449,7 +451,7 @@ public class ArtifactSimulator extends JFrame {
 						</ul>
 					</p> <br>
 					<p>
-						These flags only works if it's "Unlock". Otherwise, it will not work if it's "Lock".
+						These flags only works if the button is "Lock". Otherwise, it will not work if it's "Unlock".
 					</p> <br>
 					<p>
 						Occasionally, it may display incorrect decimals due to rounding errors.
@@ -557,8 +559,8 @@ public class ArtifactSimulator extends JFrame {
 					<p>
 						<span class='emphasis'>Defined Affix Mode</span>
 						<p>
-							This mode works like the current verion of Genshin's version 5.0. You will have to 
-							choose <span class='emphasis'>artifact piece (for sands, goblet, circlet piece)</span>, 
+							This mode works like the current verion of Genshin's v5.0. You will have to 
+							choose <span class='emphasis'>artifact piece (sands, goblet, circlet piece)</span>, 
 							<span class='emphasis'>main stat</span>, and <span class='emphasis'>2 sub-stats</span>. 
 							The rest will automatically generate.
 						</p>

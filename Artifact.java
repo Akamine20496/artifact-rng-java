@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -28,148 +29,51 @@ public final class Artifact extends Attribute {
 			"CRIT Rate%", "CRIT DMG%"
 	};
 	
-	private List<Stat> listFlower = Arrays.asList(new Stat(Attribute.HP_FLAT, 100.00));
-	private List<Stat> listFeather = Arrays.asList(new Stat(Attribute.ATK_FLAT, 100.00));
-	private List<Stat> listSands = Arrays.asList(
-			new Stat(Attribute.HP_PER, 26.68),
-			new Stat(Attribute.ATK_PER, 26.66),
-			new Stat(Attribute.DEF_PER, 26.66),
-			new Stat(Attribute.ENERGY_RECHARGE, 10.00),
-			new Stat(Attribute.ELEMENTAL_MASTERY, 10.00)
+	private final AttributeStat FLOWER_STAT = new AttributeStat(Attribute.HP_FLAT);
+	private final AttributeStat FEATHER_STAT = new AttributeStat(Attribute.ATK_FLAT);
+	
+	private final List<ProbabilityStat> listSands = Arrays.asList(
+			new ProbabilityStat(Attribute.HP_PER, 26.68),
+			new ProbabilityStat(Attribute.ATK_PER, 26.66),
+			new ProbabilityStat(Attribute.DEF_PER, 26.66),
+			new ProbabilityStat(Attribute.ENERGY_RECHARGE, 10.00),
+			new ProbabilityStat(Attribute.ELEMENTAL_MASTERY, 10.00)
 	);
-	private List<Stat> listGoblet = Arrays.asList(
-			new Stat(Attribute.HP_PER, 19.25),
-			new Stat(Attribute.ATK_PER, 19.25),
-			new Stat(Attribute.DEF_PER, 19.00),
-			new Stat(Attribute.PYRO_DMG_BONUS, 5.00),
-			new Stat(Attribute.ELECTRO_DMG_BONUS, 5.00),
-			new Stat(Attribute.CRYO_DMG_BONUS, 5.00),
-			new Stat(Attribute.HYDRO_DMG_BONUS, 5.00),
-			new Stat(Attribute.DENDRO_DMG_BONUS, 5.00),
-			new Stat(Attribute.ANEMO_DMG_BONUS, 5.00),
-			new Stat(Attribute.GEO_DMG_BONUS, 5.00),
-			new Stat(Attribute.PHYSICAL_DMG_BONUS, 5.00),
-			new Stat(Attribute.ELEMENTAL_MASTERY, 2.50)
+	private final List<ProbabilityStat> listGoblet = Arrays.asList(
+			new ProbabilityStat(Attribute.HP_PER, 19.25),
+			new ProbabilityStat(Attribute.ATK_PER, 19.25),
+			new ProbabilityStat(Attribute.DEF_PER, 19.00),
+			new ProbabilityStat(Attribute.PYRO_DMG_BONUS, 5.00),
+			new ProbabilityStat(Attribute.ELECTRO_DMG_BONUS, 5.00),
+			new ProbabilityStat(Attribute.CRYO_DMG_BONUS, 5.00),
+			new ProbabilityStat(Attribute.HYDRO_DMG_BONUS, 5.00),
+			new ProbabilityStat(Attribute.DENDRO_DMG_BONUS, 5.00),
+			new ProbabilityStat(Attribute.ANEMO_DMG_BONUS, 5.00),
+			new ProbabilityStat(Attribute.GEO_DMG_BONUS, 5.00),
+			new ProbabilityStat(Attribute.PHYSICAL_DMG_BONUS, 5.00),
+			new ProbabilityStat(Attribute.ELEMENTAL_MASTERY, 2.50)
 	);
-	private List<Stat> listCirclet = Arrays.asList(
-			new Stat(Attribute.HP_PER, 22.00),
-			new Stat(Attribute.ATK_PER, 22.00),
-			new Stat(Attribute.DEF_PER, 22.00),
-			new Stat(Attribute.CRIT_RATE, 10.00),
-			new Stat(Attribute.CRIT_DMG, 10.00),
-			new Stat(Attribute.HEALING_BONUS, 10.00),
-			new Stat(Attribute.ELEMENTAL_MASTERY, 4.00)
+	private final List<ProbabilityStat> listCirclet = Arrays.asList(
+			new ProbabilityStat(Attribute.HP_PER, 22.00),
+			new ProbabilityStat(Attribute.ATK_PER, 22.00),
+			new ProbabilityStat(Attribute.DEF_PER, 22.00),
+			new ProbabilityStat(Attribute.CRIT_RATE, 10.00),
+			new ProbabilityStat(Attribute.CRIT_DMG, 10.00),
+			new ProbabilityStat(Attribute.HEALING_BONUS, 10.00),
+			new ProbabilityStat(Attribute.ELEMENTAL_MASTERY, 4.00)
 	);
-	private List<Stat> listHpFlat = Arrays.asList(
-			new Stat(Attribute.ATK_FLAT, 15.79),
-			new Stat(Attribute.DEF_FLAT, 15.79),
-			new Stat(Attribute.HP_PER, 10.53),
-			new Stat(Attribute.ATK_PER, 10.53),
-			new Stat(Attribute.DEF_PER, 10.53),
-			new Stat(Attribute.ENERGY_RECHARGE, 10.53),
-			new Stat(Attribute.ELEMENTAL_MASTERY, 10.53),
-			new Stat(Attribute.CRIT_RATE, 7.89),
-			new Stat(Attribute.CRIT_DMG, 7.89)
-	);
-	private List<Stat> listAtkFlat = Arrays.asList(
-			new Stat(Attribute.HP_FLAT, 15.79),
-			new Stat(Attribute.DEF_FLAT, 15.79),
-			new Stat(Attribute.HP_PER, 10.53),
-			new Stat(Attribute.ATK_PER, 10.53),
-			new Stat(Attribute.DEF_PER, 10.53),
-			new Stat(Attribute.ENERGY_RECHARGE, 10.53),
-			new Stat(Attribute.ELEMENTAL_MASTERY, 10.53),
-			new Stat(Attribute.CRIT_RATE, 7.89),
-			new Stat(Attribute.CRIT_DMG, 7.89)
-	);
-	private List<Stat> listHpPer = Arrays.asList(
-			new Stat(Attribute.HP_FLAT, 15.00),
-			new Stat(Attribute.ATK_FLAT, 15.00),
-			new Stat(Attribute.DEF_FLAT, 15.00),
-			new Stat(Attribute.ATK_PER, 10.00),
-			new Stat(Attribute.DEF_PER, 10.00),
-			new Stat(Attribute.ENERGY_RECHARGE, 10.00),
-			new Stat(Attribute.ELEMENTAL_MASTERY, 10.00),
-			new Stat(Attribute.CRIT_RATE, 7.50),
-			new Stat(Attribute.CRIT_DMG, 7.50)
-	);
-	private List<Stat> listAtkPer = Arrays.asList(
-			new Stat(Attribute.HP_FLAT, 15.00),
-			new Stat(Attribute.ATK_FLAT, 15.00),
-			new Stat(Attribute.DEF_FLAT, 15.00),
-			new Stat(Attribute.HP_PER, 10.00),
-			new Stat(Attribute.DEF_PER, 10.00),
-			new Stat(Attribute.ENERGY_RECHARGE, 10.00),
-			new Stat(Attribute.ELEMENTAL_MASTERY, 10.00),
-			new Stat(Attribute.CRIT_RATE, 7.50),
-			new Stat(Attribute.CRIT_DMG, 7.50)
-	);
-	private List<Stat> listDefPer = Arrays.asList(
-			new Stat(Attribute.HP_FLAT, 15.00),
-			new Stat(Attribute.ATK_FLAT, 15.00),
-			new Stat(Attribute.DEF_FLAT, 15.00),
-			new Stat(Attribute.HP_PER, 10.00),
-			new Stat(Attribute.ATK_PER, 10.00),
-			new Stat(Attribute.ENERGY_RECHARGE, 10.00),
-			new Stat(Attribute.ELEMENTAL_MASTERY, 10.00),
-			new Stat(Attribute.CRIT_RATE, 7.50),
-			new Stat(Attribute.CRIT_DMG, 7.50)
-	);
-	private List<Stat> listEnergyRecharge = Arrays.asList(
-			new Stat(Attribute.HP_FLAT, 15.00),
-			new Stat(Attribute.ATK_FLAT, 15.00),
-			new Stat(Attribute.DEF_FLAT, 15.00),
-			new Stat(Attribute.HP_PER, 10.00),
-			new Stat(Attribute.ATK_PER, 10.00),
-			new Stat(Attribute.DEF_PER, 10.00),
-			new Stat(Attribute.ELEMENTAL_MASTERY, 10.00),
-			new Stat(Attribute.CRIT_RATE, 7.50),
-			new Stat(Attribute.CRIT_DMG, 7.50)
-	);
-	private List<Stat> listElementalMastery = Arrays.asList(
-			new Stat(Attribute.HP_FLAT, 15.00),
-			new Stat(Attribute.ATK_FLAT, 15.00),
-			new Stat(Attribute.DEF_FLAT, 15.00),
-			new Stat(Attribute.HP_PER, 10.00),
-			new Stat(Attribute.ATK_PER, 10.00),
-			new Stat(Attribute.DEF_PER, 10.00),
-			new Stat(Attribute.ENERGY_RECHARGE, 10.00),
-			new Stat(Attribute.CRIT_RATE, 7.50),
-			new Stat(Attribute.CRIT_DMG, 7.50)
-	);
-	private List<Stat> listCritRate = Arrays.asList(
-			new Stat(Attribute.HP_FLAT, 14.63),
-			new Stat(Attribute.ATK_FLAT, 14.63),
-			new Stat(Attribute.DEF_FLAT, 14.63),
-			new Stat(Attribute.HP_PER, 9.76),
-			new Stat(Attribute.ATK_PER, 9.76),
-			new Stat(Attribute.DEF_PER, 9.76),
-			new Stat(Attribute.ENERGY_RECHARGE, 9.76),
-			new Stat(Attribute.ELEMENTAL_MASTERY, 9.76),
-			new Stat(Attribute.CRIT_DMG, 7.32)
-	);
-	private List<Stat> listCritDmg = Arrays.asList(
-			new Stat(Attribute.HP_FLAT, 14.63),
-			new Stat(Attribute.ATK_FLAT, 14.63),
-			new Stat(Attribute.DEF_FLAT, 14.63),
-			new Stat(Attribute.HP_PER, 9.76),
-			new Stat(Attribute.ATK_PER, 9.76),
-			new Stat(Attribute.DEF_PER, 9.76),
-			new Stat(Attribute.ENERGY_RECHARGE, 9.76),
-			new Stat(Attribute.ELEMENTAL_MASTERY, 9.76),
-			new Stat(Attribute.CRIT_RATE, 7.32)
-	);
-	private List<Stat> listSpecialAtt = Arrays.asList(
-			new Stat(Attribute.HP_FLAT, 13.64),
-			new Stat(Attribute.ATK_FLAT, 13.64),
-			new Stat(Attribute.DEF_FLAT, 13.64),
-			new Stat(Attribute.HP_PER, 9.09),
-			new Stat(Attribute.ATK_PER, 9.09),
-			new Stat(Attribute.DEF_PER, 9.09),
-			new Stat(Attribute.ENERGY_RECHARGE, 9.09),
-			new Stat(Attribute.ELEMENTAL_MASTERY, 9.09),
-			new Stat(Attribute.CRIT_RATE, 6.82),
-			new Stat(Attribute.CRIT_DMG, 6.82)
+	
+	private final List<WeightedStat> listStatWeight = Arrays.asList(
+			new WeightedStat(Attribute.HP_FLAT, 6),
+			new WeightedStat(Attribute.ATK_FLAT, 6),
+			new WeightedStat(Attribute.DEF_FLAT, 6),
+			new WeightedStat(Attribute.HP_PER, 4),
+			new WeightedStat(Attribute.ATK_PER, 4),
+			new WeightedStat(Attribute.DEF_PER, 4),
+			new WeightedStat(Attribute.ENERGY_RECHARGE, 4),
+			new WeightedStat(Attribute.ELEMENTAL_MASTERY, 4),
+			new WeightedStat(Attribute.CRIT_RATE, 3),
+			new WeightedStat(Attribute.CRIT_DMG, 3)
 	);
 	
 	
@@ -198,11 +102,7 @@ public final class Artifact extends Attribute {
 	}
 	
 	public String generateRandomPiece() {
-		List<String> listPiece = Arrays.asList(
-				FLOWER, FEATHER, SANDS,
-				GOBLET, CIRCLET
-		);
-		
+		List<String> listPiece = Arrays.asList(FLOWER, FEATHER, SANDS, GOBLET, CIRCLET);
 		int randomIndex = new Random().nextInt(listPiece.size());
 		return listPiece.get(randomIndex);
 	}
@@ -210,9 +110,9 @@ public final class Artifact extends Attribute {
 	public String generateMainAttribute(String artifactPiece) throws IllegalArgumentException {
 		return switch (artifactPiece) {
 			case FLOWER ->
-				listFlower.get(0).getAttribute();
+				FLOWER_STAT.getAttribute();
 			case FEATHER ->
-				listFeather.get(0).getAttribute();
+				FEATHER_STAT.getAttribute();
 			case SANDS ->
 				generatedAttribute(listSands);
 			case GOBLET ->
@@ -225,34 +125,25 @@ public final class Artifact extends Attribute {
 		};
 	}
 	
-	public String generateSubAttribute(String mainAttribute) throws IllegalArgumentException {
-		if(isNotSpecial(mainAttribute)) {
-			return switch (mainAttribute) {
-				case Attribute.HP_FLAT ->
-					generatedAttribute(listHpFlat);
-	    		case Attribute.ATK_FLAT ->
-	    			generatedAttribute(listAtkFlat);
-	            case Attribute.HP_PER ->
-	                generatedAttribute(listHpPer);
-	            case Attribute.ATK_PER ->
-	                generatedAttribute(listAtkPer);
-	            case Attribute.DEF_PER ->
-	                generatedAttribute(listDefPer);
-	            case Attribute.ENERGY_RECHARGE ->
-	            	generatedAttribute(listEnergyRecharge);
-	            case Attribute.ELEMENTAL_MASTERY ->
-	                generatedAttribute(listElementalMastery);
-	            case Attribute.CRIT_RATE ->
-	            	generatedAttribute(listCritRate);
-	            case Attribute.CRIT_DMG ->
-	            	generatedAttribute(listCritDmg);
-	            default ->
-	            	// Throw an exception if none of the cases or the isNotSpecial condition is met
-	        	    throw new IllegalArgumentException("Invalid attribute: " + mainAttribute);
-			};
-		} else {
-			return generatedAttribute(listSpecialAtt);
+	public String generateSubAttribute(String... attributes) throws NullPointerException {
+		List<String> notSpecialAttributes = new ArrayList<>();
+		
+		for (String attribute : attributes) {
+			if (attribute == null) {
+				throw new NullPointerException("Attribute must not be null.");
+			}
+			
+			if (isNotSpecialAttribute(attribute)) {
+				notSpecialAttributes.add(attribute);
+			}
 		}
+		
+		List<ProbabilityStat> statsList = getStatProbabilityList(notSpecialAttributes);
+		
+		// for debugging purposes
+		checkIfHundredPercent(statsList);
+		
+		return generatedAttribute(statsList);
 	}
 	
 	public int generateMaxUpgrade() {
@@ -274,9 +165,10 @@ public final class Artifact extends Attribute {
 		double[] probabilities = { 23.73, 39.55, 26.37, 8.79, 1.46, 0.09 };
 		double cumulativeProbability = 0;
 		
-		for(int i = 0; i <= upgradeTimes.length; i++) {
+		for (int i = 0; i <= upgradeTimes.length; i++) {
 			cumulativeProbability += probabilities[i];
-			if(upgradeChance <= cumulativeProbability) {
+			
+			if (upgradeChance <= cumulativeProbability) {
 				return upgradeTimes[i];
 			}
 		}
@@ -285,10 +177,30 @@ public final class Artifact extends Attribute {
 		return upgradeTimes[0];
 	}
 	
+	public int generateRandomSlot() {
+		double slotChance = generateNumber();
+
+		int[] slots = { 1, 2, 3, 4 };
+		double[] probabilities = { 25.00, 25.00, 25.00, 25.00 };
+		double cumulativeProbability = 0;
+
+		for (int i = 0; i < slots.length; i++) {
+			cumulativeProbability += probabilities[i];
+			
+			if (slotChance <= cumulativeProbability) {
+				return slots[i];
+			}
+		}
+
+		// If we reach here, something went wrong, so just return the first element
+		return slots[0];
+	}
+	
 	public double generateValue(String attribute) throws IllegalArgumentException {
 		if (attribute == null) {
-			throw new NullPointerException("attribute must not be null");
+			throw new NullPointerException("Attribute must not be null");
 		}
+		
 		// "ATK%", "HP%", "DEF%", "ATK", "HP", "DEF", "Energy Recharge", "Elemental Mastery", "Crit Rate", "Crit Damage"
 		
 		/*
@@ -300,24 +212,23 @@ public final class Artifact extends Attribute {
 		 * 25% chance 70% value of the max stat
 		 */
 		
-		for(Stat stats : Attribute.STATS) {
-			if(stats.getAttribute().equals(attribute)) {
-				return generatedValue(stats.getValues());
+		for (ValueStat currentStat : Attribute.VALUE_STATS) {
+			if (currentStat.getAttribute().equals(attribute)) {
+				return generatedValue(currentStat.getValues());
 			}
 		}
 		
-		// Throw an exception if we reach here meaning that the attribute is not
-		// in the array of stats
+		// Throw an exception if we reach here meaning that the attribute is not in the array of stats
 		throw new IllegalArgumentException("Invalid attribute: " + attribute);
 	}
 	
 	public String formatText(String attribute) {
 		if (attribute == null) {
-			throw new NullPointerException("attribute must not be null");
+			throw new NullPointerException("Attribute must not be null");
 		}
 		
 		// checks if the attribute is percentage
-		if(attribute.substring(attribute.length() - 1).equals("%")) {
+		if (attribute.substring(attribute.length() - 1).equals("%")) {
 			return attribute.substring(0, attribute.length() - 1);
 		}
 		
@@ -327,13 +238,13 @@ public final class Artifact extends Attribute {
 	
 	public String formatText(String attribute, double value) {
 		if (attribute == null) {
-			throw new NullPointerException("attribute must not be null");
+			throw new NullPointerException("Attribute must not be null");
 		}
 		
 		// checks if the attribute is percentage
-		if(attribute.substring(attribute.length() - 1).equals("%")) {
+		if (attribute.substring(attribute.length() - 1).equals("%")) {
 			String modifiedAtt = attribute.substring(0, attribute.length() - 1);
-			return String.format("%s+%.1f", modifiedAtt, value) + "%";
+			return String.format("%s+%.1f%%", modifiedAtt, value);
 		}
 		
 		// return the flat attribute
@@ -342,13 +253,13 @@ public final class Artifact extends Attribute {
 	
 	public String formatText(String attribute, double prevValue, double currValue) {
 		if (attribute == null) {
-			throw new NullPointerException("attribute must not be null");
+			throw new NullPointerException("Attribute must not be null");
 		}
 		
 		// checks if the attribute is percentage
-		if(attribute.substring(attribute.length() - 1).equals("%")) {
+		if (attribute.substring(attribute.length() - 1).equals("%")) {
 			String modifiedAtt = attribute.substring(0, attribute.length() - 1);
-			return String.format("%s    %.1f%s ---> %.1f%s", modifiedAtt, prevValue, "%", currValue, "%");
+			return String.format("%s    %.1f%% ---> %.1f%%", modifiedAtt, prevValue, currValue);
 		}
 		
 		// return the flat attribute
@@ -357,40 +268,82 @@ public final class Artifact extends Attribute {
 	
 	public String formatValue(String attribute, double value) {
 		if (attribute == null) {
-			throw new NullPointerException("attribute must not be null");
+			throw new NullPointerException("Attribute must not be null");
 		}
 		
 		// checks if the attribute is percentage
-		if(attribute.substring(attribute.length() - 1).equals("%")) {
-			return String.format("%.1f", value) + "%";
+		if (attribute.substring(attribute.length() - 1).equals("%")) {
+			return String.format("%.1f%%", value);
 		}
 		
 		// return the flat attribute
 		return String.valueOf(Math.round(value));
 	}
 	
-	public boolean isUnique(String... attributes) {
-		HashMap<String, Integer> map = new HashMap<>();
+	private void checkIfHundredPercent(List<ProbabilityStat> listStats) {
+		double totalProbability = 0;
 		
-		for(String attribute : attributes) {
-			// append the attribute to the hash map
-			map.put(attribute, 1);
+		for (ProbabilityStat currentStat : listStats) {
+			totalProbability += currentStat.getProbability();
 		}
-
-	    // If map size is equal to array of attributes, all attributes are unique
-	    return map.size() == attributes.length;
+		
+		System.out.format("%nFrom %s%nTotal Probability is %.2f%%%n%n", listStats.toString(), totalProbability);
 	}
+	
+	private List<ProbabilityStat> getStatProbabilityList(List<String> attributes) {
+		List<WeightedStat> notExistingStats = new ArrayList<>();
+		List<ProbabilityStat> selectedStats = new ArrayList<>();
+		
+		for (WeightedStat currentStat : listStatWeight) {
+			if (!attributes.contains(currentStat.getAttribute())) {
+				notExistingStats.add(currentStat);
+			}
+		}
+		
+		for (WeightedStat currentStat : notExistingStats) {
+			selectedStats.add(calculateStatProbability(currentStat, attributes));
+		}
+		
+		return selectedStats;
+	}
+	
+	private ProbabilityStat calculateStatProbability(WeightedStat targetWeightedStat, List<String> existingStats) throws NullPointerException, IllegalArgumentException {
+		// verify the targetWeightedStat and existingStats
+		if (targetWeightedStat == null || existingStats == null) {
+        	throw new NullPointerException("Requires non-null object");
+        }
+				
+        int totalWeight = 0;
+        
+        // verify the targetWeightedStat
+        if (!Arrays.asList(Attribute.ATTRIBUTES).contains(targetWeightedStat.getAttribute())) {
+        	throw new IllegalArgumentException("Invalid attribute: " + targetWeightedStat.getAttribute());
+        }
+        
+        // Calculate the total weight of available sub-stats (excluding the ones already existing)
+        for (WeightedStat currentStat : listStatWeight) {
+        	if (!existingStats.contains(currentStat.getAttribute())) {
+        		totalWeight += currentStat.getWeight();
+        	}
+        }
+        
+        double probability = (double) targetWeightedStat.getWeight() / totalWeight * 100;
+        
+        return new ProbabilityStat(targetWeightedStat.getAttribute(), probability);
+    }
 	
 	// GENERATING RANDOM ATTRIBUTE
 	
-	private String generatedAttribute(List<Stat> listAttribute) {
+	private String generatedAttribute(List<ProbabilityStat> listAttribute) {
 		double attributeChance = generateNumber();
 		double cumulativeProbability = 0;
 		
-		for(int i = 0; i < listAttribute.size(); i++) {
-			cumulativeProbability += listAttribute.get(i).getProbability();
+		for (int i = 0; i < listAttribute.size(); i++) {
+			ProbabilityStat currentStat = listAttribute.get(i);
+			cumulativeProbability += currentStat.getProbability();
+			
 			if(attributeChance <= cumulativeProbability) {
-				return listAttribute.get(i).getAttribute();
+				return currentStat.getAttribute();
 			}
 		}
 		
@@ -402,13 +355,13 @@ public final class Artifact extends Attribute {
 	
 	private double generatedValue(double[] attributeValue) {
 		double valueChance = generateNumber();
-		
 		double[] probabilities = { 25.00, 25.00, 25.00, 25.00 };
 		double cumulativeProbability = 0;
 		
-		for(int i = 0; i < attributeValue.length; i++) {
+		for (int i = 0; i < attributeValue.length; i++) {
 			cumulativeProbability += probabilities[i];
-			if(valueChance <= cumulativeProbability) {
+			
+			if (valueChance <= cumulativeProbability) {
 				return attributeValue[i];
 			}
 		}
