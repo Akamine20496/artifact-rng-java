@@ -1,6 +1,6 @@
 # Artifact RNG Java Swing
 
-You can preview roll your artifact or just generate random stats.
+You can make this application kind of guess your artifact rolls or just generate random stats.
 
 ## Features
 
