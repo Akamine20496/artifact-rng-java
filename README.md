@@ -27,4 +27,4 @@ You can make this application kind of guess your artifact rolls or just generate
   [KeqingMains](https://keqingmains.com/misc/artifacts/#Substats)
 
 ## Disclaimer
-- This Web Application is not affiliated with HoYoVerse or miHoYo.
+- This Desktop Application is not affiliated with HoYoVerse or miHoYo.
