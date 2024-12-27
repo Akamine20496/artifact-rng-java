@@ -34,30 +34,36 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class CustomStatDialog extends JDialog {
+	/**
+	 * Serial Version UID
+	 */
+	private static final long serialVersionUID = 4532225073811566600L;
+	
 	private static String title = "Setup Custom Stat";
 	private static boolean isCustomStatDisplayed;
 	
+	private Attribute attribute = Attribute.getInstance();
 	private Artifact artifact = new Artifact();
-	private ArtifactDisplayerPanel objArtifactDisplayer;
+	private ArtifactStat artifactStat;
 	private DefaultComboBoxModel<Double> modelDefaultValue = new DefaultComboBoxModel<>(new Double[] {0.00});
 	private DefaultListModel<String> modelAttributes = new DefaultListModel<>();
 	private JComboBox<String> cboArtifactPiece;
 	private JComboBox<String> cboMainStat;
-	private JComboBox<Double> cboValue1;
-	private JComboBox<Double> cboValue2;
-	private JComboBox<Double> cboValue3;
-	private JComboBox<Double> cboValue4;
+	private JComboBox<Double> cboAttrValue1;
+	private JComboBox<Double> cboAttrValue2;
+	private JComboBox<Double> cboAttrValue3;
+	private JComboBox<Double> cboAttrValue4;
 	private JList<String> listAttributes;
 	private JLabel lblListHeader;
-	private JLabel lblAtt1;
-	private JLabel lblAtt2;
-	private JLabel lblAtt3;
-	private JLabel lblAtt4;
+	private JLabel lblAttr1;
+	private JLabel lblAttr2;
+	private JLabel lblAttr3;
+	private JLabel lblAttr4;
 	private JScrollPane scrollPane;
-	private JButton btnAddSubstat;
-	private JButton btnRemoveSubstat;
+	private JButton btnAddSubStat;
+	private JButton btnRemoveSubStat;
 	private JButton btnRemoveAll;
-	private JButton btnDisplay;
+	private JButton btnFinalizeStat;
 	private JPanel contentPane;
 	private JCheckBox chkDefinedAffixMode;
 	private boolean definedAffixMode;
@@ -65,10 +71,10 @@ public class CustomStatDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public CustomStatDialog(Frame owner, ArtifactDisplayerPanel objArtifactDisplayer) {
+	public CustomStatDialog(Frame owner, ArtifactStat artifactStat) {
 		super(owner, title, true);
 		
-		this.objArtifactDisplayer = objArtifactDisplayer;
+		this.artifactStat = artifactStat;
 		
 		setLookAndFeel();
 		
@@ -76,9 +82,9 @@ public class CustomStatDialog extends JDialog {
 		setLocationRelativeTo(owner);
 		setResizable(false);
 		getContentPane().setLayout(new BorderLayout(0, 0));
-		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(CustomStatDialog.class.getResource("/assets/Amber Icon.jpg")));
-		getRootPane().setDefaultButton(btnDisplay);
+		getRootPane().setDefaultButton(btnFinalizeStat);
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -88,7 +94,7 @@ public class CustomStatDialog extends JDialog {
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setBackground(new Color(255, 255, 255));
+		contentPane.setBackground(new Color(240, 240, 240));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
@@ -99,56 +105,54 @@ public class CustomStatDialog extends JDialog {
 		panelSetup.setLayout(null);
 		contentPane.add(panelSetup);
 		
-		btnDisplay = new JButton("Display Stats");
-		btnDisplay.setBounds(393, 238, 125, 30);
-		btnDisplay.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		btnDisplay.addActionListener(new ActionListener() {
+		btnFinalizeStat = new JButton("Finalize Stat");
+		btnFinalizeStat.setBounds(393, 238, 125, 30);
+		btnFinalizeStat.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		btnFinalizeStat.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String attribute = (String) cboMainStat.getSelectedItem();
 				
-				if ((isNone(lblAtt1.getText()) || isNone(lblAtt2.getText())) || 
-						(!isNone(lblAtt1.getText()) && !isNone(lblAtt2.getText()) && 
-								isNone(lblAtt3.getText()) && !isNone(lblAtt4.getText()))) {
-									String message = """
-												Can display stats if
-													* Slot 1 and Slot 2 are filled
-													* Slot 1 to 3 are filled or Slot 1 to 4 are filled
-													
-												Cannot display stats if
-													* All Slots are empty
-													* Slot 1 and Slot 2 are empty but Slot 3 and Slot 4 are filled
-											""";
-							
-									JOptionPane.showMessageDialog(contentPane, message);
-				} else if(lblAtt1.getText().equals(attribute) || lblAtt2.getText().equals(attribute) || 
-						lblAtt3.getText().equals(attribute) || lblAtt4.getText().equals(attribute)) {
-							JOptionPane.showMessageDialog(contentPane, "A sub-stat cannot be the same as the main stat!");
+				if ((isNone(lblAttr1.getText()) || isNone(lblAttr2.getText())) || 
+						(!isNone(lblAttr1.getText()) && !isNone(lblAttr2.getText()) && 
+								isNone(lblAttr3.getText()) && !isNone(lblAttr4.getText()))) {
+					String message = """
+								Can display stat if
+									* Slot 1 and Slot 2 are filled
+									* Slot 1 to 3 are filled or Slot 1 to 4 are filled
+									
+								Cannot display stat if
+									* All Slots are empty
+									* Slot 1 and Slot 2 are empty but Slot 3 and Slot 4 are filled
+							""";
+			
+					JOptionPane.showMessageDialog(contentPane, message);
+				} else if (lblAttr1.getText().equals(attribute) || lblAttr2.getText().equals(attribute) ||
+							lblAttr3.getText().equals(attribute) || lblAttr4.getText().equals(attribute)) {
+					JOptionPane.showMessageDialog(contentPane, "A sub-stat cannot be the same as the main attribute!");
 				} else {
-					int response = JOptionPane.showConfirmDialog(contentPane, 
-							"Display the stats?", "Select an option", JOptionPane.YES_NO_OPTION);
+					int response = JOptionPane.showConfirmDialog(contentPane, "Finalize the stat?", "Select an option", JOptionPane.YES_NO_OPTION);
 					
 					if (response == JOptionPane.YES_OPTION) {
                     	displayCustomStats();
                         isCustomStatDisplayed = true;
-                		JOptionPane.showMessageDialog(contentPane, "Stats have been displayed!");
                 		dispose();
 					}
 				}
 			}
 		});
-		panelSetup.add(btnDisplay);
+		panelSetup.add(btnFinalizeStat);
 		
 		JLabel lblText1 = new JLabel("ARTIFACT PIECE");
 		lblText1.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		lblText1.setBounds(10, 11, 90, 23);
+		lblText1.setBounds(10, 11, 110, 23);
 		panelSetup.add(lblText1);
 		
-		JLabel lblText2 = new JLabel("MAIN STAT");
+		JLabel lblText2 = new JLabel("MAIN ATTRIBUTE");
 		lblText2.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		lblText2.setBounds(10, 63, 90, 23);
+		lblText2.setBounds(10, 63, 110, 23);
 		panelSetup.add(lblText2);
 		
-		cboArtifactPiece = new JComboBox<>(new DefaultComboBoxModel<>(artifact.getPiece()));
+		cboArtifactPiece = new JComboBox<>(new DefaultComboBoxModel<>(artifact.getArtifactPiece()));
 		cboArtifactPiece.setFont(new Font("Segoe UI", Font.BOLD, 12));
 		cboArtifactPiece.setBounds(10, 29, 238, 30);
 		cboArtifactPiece.setSelectedIndex(0);
@@ -158,23 +162,23 @@ public class CustomStatDialog extends JDialog {
 				
 				cboMainStat.setModel(switch (selectedPiece) {
 					case Artifact.FLOWER ->
-						new DefaultComboBoxModel<>(artifact.getFlower());
+						new DefaultComboBoxModel<>(artifact.getFlowerPiece());
 					case Artifact.FEATHER ->
-						new DefaultComboBoxModel<>(artifact.getFeather());
+						new DefaultComboBoxModel<>(artifact.getFeatherPiece());
 					case Artifact.SANDS ->
-						new DefaultComboBoxModel<>(artifact.getSands());
+						new DefaultComboBoxModel<>(artifact.getSandsPiece());
 					case Artifact.GOBLET ->
-						new DefaultComboBoxModel<>(artifact.getGoblet());
+						new DefaultComboBoxModel<>(artifact.getGobletPiece());
 					case Artifact.CIRCLET ->
-						new DefaultComboBoxModel<>(artifact.getCirclet());
+						new DefaultComboBoxModel<>(artifact.getCircletPiece());
 					default ->
-						throw new IllegalArgumentException("Unexpected piece: " + selectedPiece);
+						throw new IllegalArgumentException("Invalid artifact piece: " + selectedPiece);
 				});
 			}
 		});
 		panelSetup.add(cboArtifactPiece);
 		
-		cboMainStat = new JComboBox<>(new DefaultComboBoxModel<>(artifact.getFlower()));
+		cboMainStat = new JComboBox<>(new DefaultComboBoxModel<>(artifact.getFlowerPiece()));
 		cboMainStat.setFont(new Font("Segoe UI", Font.BOLD, 12));
 		cboMainStat.setBounds(10, 82, 238, 30);
 		cboMainStat.addActionListener(new ActionListener() {
@@ -183,14 +187,14 @@ public class CustomStatDialog extends JDialog {
 
 				modelAttributes.removeAllElements();
 
-				if(artifact.isNotSpecialAttribute(mainStat)) {
-					for(String attributes : Attribute.ATTRIBUTES) {
+				if(attribute.isNotSpecialAttributeName(mainStat)) {
+					for(String attributes : Attribute.ATTRIBUTE_NAMES) {
 						if(!mainStat.equals(attributes)) {
 							modelAttributes.addElement(attributes);
 						}
 					}
 				} else {
-					for(String attributes : Attribute.ATTRIBUTES) {
+					for(String attributes : Attribute.ATTRIBUTE_NAMES) {
 						modelAttributes.addElement(attributes);
 					}
 				}
@@ -211,8 +215,8 @@ public class CustomStatDialog extends JDialog {
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 					if(listAttributes.getSelectedIndex() >= 0) {
 						// Invoke the btnAddSubStat click event
-						ActionEvent event = new ActionEvent(btnAddSubstat, ActionEvent.ACTION_PERFORMED, null);
-						btnAddSubstat.getActionListeners()[0].actionPerformed(event);
+						ActionEvent event = new ActionEvent(btnAddSubStat, ActionEvent.ACTION_PERFORMED, null);
+						btnAddSubStat.getActionListeners()[0].actionPerformed(event);
 					}
 				}
 			}
@@ -237,35 +241,35 @@ public class CustomStatDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				if (chkDefinedAffixMode.isSelected()) {
 					definedAffixMode = true;
-					lblAtt3.setEnabled(false);
-					lblAtt4.setEnabled(false);
-					cboValue1.setEnabled(false);
-					cboValue2.setEnabled(false);
-					cboValue3.setEnabled(false);
-					cboValue4.setEnabled(false);
+					lblAttr3.setEnabled(false);
+					lblAttr4.setEnabled(false);
+					cboAttrValue1.setEnabled(false);
+					cboAttrValue2.setEnabled(false);
+					cboAttrValue3.setEnabled(false);
+					cboAttrValue4.setEnabled(false);
 					
-					lblAtt3.setText("None");
-					lblAtt4.setText("None");
+					lblAttr3.setText("None");
+					lblAttr4.setText("None");
 					
-					cboValue1.setModel(modelDefaultValue);
-					cboValue2.setModel(modelDefaultValue);
-					cboValue3.setModel(modelDefaultValue);
-					cboValue4.setModel(modelDefaultValue);
+					cboAttrValue1.setModel(modelDefaultValue);
+					cboAttrValue2.setModel(modelDefaultValue);
+					cboAttrValue3.setModel(modelDefaultValue);
+					cboAttrValue4.setModel(modelDefaultValue);
 				} else {
 					definedAffixMode = false;
-					lblAtt3.setEnabled(true);
-					lblAtt4.setEnabled(true);
-					cboValue1.setEnabled(true);
-					cboValue2.setEnabled(true);
-					cboValue3.setEnabled(true);
-					cboValue4.setEnabled(true);
+					lblAttr3.setEnabled(true);
+					lblAttr4.setEnabled(true);
+					cboAttrValue1.setEnabled(true);
+					cboAttrValue2.setEnabled(true);
+					cboAttrValue3.setEnabled(true);
+					cboAttrValue4.setEnabled(true);
 					
-					if (!isNone(lblAtt1.getText())) {
-						setValue(lblAtt1, cboValue1);
+					if (!isNone(lblAttr1.getText())) {
+						setValue(lblAttr1, cboAttrValue1);
 					}
 					
-					if (!isNone(lblAtt2.getText())) {
-						setValue(lblAtt2, cboValue2);
+					if (!isNone(lblAttr2.getText())) {
+						setValue(lblAttr2, cboAttrValue2);
 					}
 				}
 			}
@@ -274,109 +278,116 @@ public class CustomStatDialog extends JDialog {
 		chkDefinedAffixMode.setBounds(393, 11, 125, 23);
 		panelSetup.add(chkDefinedAffixMode);
 		
-		lblAtt4 = new JLabel("None");
-		lblAtt4.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		lblAtt4.setBounds(258, 134, 125, 30);
-		panelSetup.add(lblAtt4);
+		lblAttr4 = new JLabel("None");
+		lblAttr4.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		lblAttr4.setBounds(258, 134, 125, 30);
+		panelSetup.add(lblAttr4);
 		
-		lblAtt3 = new JLabel("None");
-		lblAtt3.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		lblAtt3.setBounds(258, 102, 125, 30);
-		panelSetup.add(lblAtt3);
+		lblAttr3 = new JLabel("None");
+		lblAttr3.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		lblAttr3.setBounds(258, 102, 125, 30);
+		panelSetup.add(lblAttr3);
 		
-		lblAtt2 = new JLabel("None");
-		lblAtt2.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		lblAtt2.setBounds(258, 70, 125, 30);
-		panelSetup.add(lblAtt2);
+		lblAttr2 = new JLabel("None");
+		lblAttr2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		lblAttr2.setBounds(258, 70, 125, 30);
+		panelSetup.add(lblAttr2);
 		
-		lblAtt1 = new JLabel("None");
-		lblAtt1.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		lblAtt1.setBounds(258, 38, 125, 30);
-		panelSetup.add(lblAtt1);
+		lblAttr1 = new JLabel("None");
+		lblAttr1.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		lblAttr1.setBounds(258, 38, 125, 30);
+		panelSetup.add(lblAttr1);
 		
-		cboValue1 = new JComboBox<>(modelDefaultValue);
-		cboValue1.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		cboValue1.setBounds(393, 38, 125, 30);
-		panelSetup.add(cboValue1);
+		cboAttrValue1 = new JComboBox<>(modelDefaultValue);
+		cboAttrValue1.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		cboAttrValue1.setBounds(393, 38, 125, 30);
+		panelSetup.add(cboAttrValue1);
 		
-		cboValue2 = new JComboBox<>(modelDefaultValue);
-		cboValue2.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		cboValue2.setBounds(393, 70, 125, 30);
-		panelSetup.add(cboValue2);
+		cboAttrValue2 = new JComboBox<>(modelDefaultValue);
+		cboAttrValue2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		cboAttrValue2.setBounds(393, 70, 125, 30);
+		panelSetup.add(cboAttrValue2);
 		
-		cboValue3 = new JComboBox<>(modelDefaultValue);
-		cboValue3.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		cboValue3.setBounds(393, 102, 125, 30);
-		panelSetup.add(cboValue3);
+		cboAttrValue3 = new JComboBox<>(modelDefaultValue);
+		cboAttrValue3.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		cboAttrValue3.setBounds(393, 102, 125, 30);
+		panelSetup.add(cboAttrValue3);
 		
-		cboValue4 = new JComboBox<>(modelDefaultValue);
-		cboValue4.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		cboValue4.setBounds(393, 134, 125, 30);
-		panelSetup.add(cboValue4);
+		cboAttrValue4 = new JComboBox<>(modelDefaultValue);
+		cboAttrValue4.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		cboAttrValue4.setBounds(393, 134, 125, 30);
+		panelSetup.add(cboAttrValue4);
 		
 		JLabel lblText4 = new JLabel("OPERATIONS");
 		lblText4.setFont(new Font("Segoe UI", Font.BOLD, 12));
 		lblText4.setBounds(258, 178, 90, 23);
 		panelSetup.add(lblText4);
 		
-		btnAddSubstat = new JButton("Add Sub-Stat");
-		btnAddSubstat.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		btnAddSubstat.setBounds(258, 197, 125, 30);
-		btnAddSubstat.addActionListener(new ActionListener() {
+		btnAddSubStat = new JButton("Add Sub-Stat");
+		btnAddSubStat.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		btnAddSubStat.setBounds(258, 197, 125, 30);
+		btnAddSubStat.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(modelAttributes.isEmpty()) {
+				if (modelAttributes.isEmpty()) {
 					JOptionPane.showMessageDialog(contentPane, "List is empty!");
 				} else {
-					if(listAttributes.getSelectedIndex() >= 0) {
+					if (listAttributes.getSelectedIndex() >= 0) {
 						boolean isAdded = false;
 						
 						do {
 							String attribute = listAttributes.getSelectedValue();
 							
-							String message1 = """
-									<html>
-										Enter the number to add a sub-stat and click '<b>OK</b>'
-										<br> <br>
-										Selected Sub-Stat: <b>%s</b>
-										<br> <br>
-										<b>[1]</b> Slot 1 (%s) <br>
-										<b>[2]</b> Slot 2 (%s) <br>
-										<b>[3]</b> Slot 3 (%s) <br>
-										<b>[4]</b> Slot 4 (%s) <br>
-									</html>
-							""".formatted(attribute, lblAtt1.getText(), lblAtt2.getText(), lblAtt3.getText(), lblAtt4.getText());
+							String dialogMessage = "";
 							
-							String message2 = """
-									<html>
-									Enter the number to add a sub-stat and click '<b>OK</b>'
-									<br> <br>
-									Selected Sub-Stat: <b>%s</b>
-									<br> <br>
-									<b>[1]</b> Slot 1 (%s) <br>
-									<b>[2]</b> Slot 2 (%s) <br>
-								</html>
-							""".formatted(attribute, lblAtt1.getText(), lblAtt2.getText());
+							if (definedAffixMode) {
+								dialogMessage = """
+										<html>
+											<p>Enter the number to add a sub-stat and click '<b>OK</b>'</p> <br>
+											<p>Selected Sub-Stat: <b>%s</b></p> <br>
+											<p>
+												<b>[1]</b> Slot 1 (%s) <br>
+												<b>[2]</b> Slot 2 (%s) <br>
+											</p>
+										</html>
+										""".formatted(attribute, lblAttr1.getText(), lblAttr2.getText());
+							} else {
+								dialogMessage = """
+										<html>
+											<p>Enter the number to add a sub-stat and click '<b>OK</b>'</p> <br>
+											<p>Selected Sub-Stat: <b>%s</b></p> <br>
+											<p>
+												<b>[1]</b> Slot 1 (%s) <br>
+												<b>[2]</b> Slot 2 (%s) <br>
+												<b>[3]</b> Slot 3 (%s) <br>
+												<b>[4]</b> Slot 4 (%s) <br>
+											</p>
+										</html>
+										""".formatted(attribute, lblAttr1.getText(), lblAttr2.getText(), lblAttr3.getText(), lblAttr4.getText());
+							}
 							
-							String result = JOptionPane.showInputDialog(contentPane, 
-									definedAffixMode ? message2 : message1, "Add Sub-Stat", JOptionPane.PLAIN_MESSAGE);
+							String result = JOptionPane.showInputDialog(contentPane, dialogMessage, "Add Sub-Stat", JOptionPane.PLAIN_MESSAGE);
 							
-							if((result != null) && (result.length() > 0)) {
-								if(attribute.equals(lblAtt1.getText()) || attribute.equals(lblAtt2.getText())
-										|| attribute.equals(lblAtt3.getText()) || attribute.equals(lblAtt4.getText())) {
-											JOptionPane.showMessageDialog(contentPane, attribute + " is already been added!");
+							if (result != null) {
+								result = result.trim();
+								
+								if (result.isBlank()) {
+									JOptionPane.showMessageDialog(contentPane, "Enter the slot number to add the stat!");
+								} else if (attribute.equals(lblAttr1.getText()) || attribute.equals(lblAttr2.getText()) || 
+										attribute.equals(lblAttr3.getText()) || attribute.equals(lblAttr4.getText())) {
+									JOptionPane.showMessageDialog(contentPane, attribute + " is already been added!");
 								} else {
-									switch(result.trim()) {
+									switch (result) {
 										case "1" -> {
-											addStat(lblAtt1, attribute, cboValue1);
+											addStat(lblAttr1, attribute, cboAttrValue1);
 											isAdded = true;											
 										}
 										case "2" -> {											
-											addStat(lblAtt2, attribute, cboValue2);
+											addStat(lblAttr2, attribute, cboAttrValue2);
 											isAdded = true;
 										}
 										case "3" -> {											
 											if (!definedAffixMode) {
-												addStat(lblAtt3, attribute, cboValue3);
+												addStat(lblAttr3, attribute, cboAttrValue3);
 												isAdded = true;
 											} else {
 												JOptionPane.showMessageDialog(contentPane, "Enter a number only 1 and 2!");
@@ -384,7 +395,7 @@ public class CustomStatDialog extends JDialog {
 										}
 										case "4" -> {											
 											if (!definedAffixMode) {
-												addStat(lblAtt4, attribute, cboValue4);
+												addStat(lblAttr4, attribute, cboAttrValue4);
 												isAdded = true;
 											} else {
 												JOptionPane.showMessageDialog(contentPane, "Enter a number only 1 and 2!");
@@ -396,13 +407,10 @@ public class CustomStatDialog extends JDialog {
 										}
 									}
 								}
-							} else if(result == null) { // if CANCEL button is clicked and Window is CLOSED
-								listAttributes.clearSelection(); // clears the list selection
+							} else { // if CANCEL button is clicked and Window is CLOSED
 								break; // stops the loop
-							} else if(result.isBlank()) {
-								JOptionPane.showMessageDialog(contentPane, "Enter the slot number to add the stat!");
 							}
-						} while(!isAdded);
+						} while (!isAdded);
 						listAttributes.clearSelection(); // clears the list selection
 					} else {
 						JOptionPane.showMessageDialog(contentPane, "Select a sub-stat to add!");
@@ -410,92 +418,101 @@ public class CustomStatDialog extends JDialog {
 				}
 			}
 		});
-		panelSetup.add(btnAddSubstat);
+		panelSetup.add(btnAddSubStat);
 		
-		btnRemoveSubstat = new JButton("Remove Sub-Stat");
-		btnRemoveSubstat.setFont(new Font("Segoe UI", Font.BOLD, 11));
-		btnRemoveSubstat.setBounds(258, 238, 125, 30);
-		btnRemoveSubstat.addActionListener(new ActionListener() {
+		btnRemoveSubStat = new JButton("Remove Sub-Stat");
+		btnRemoveSubStat.setFont(new Font("Segoe UI", Font.BOLD, 11));
+		btnRemoveSubStat.setBounds(258, 238, 125, 30);
+		btnRemoveSubStat.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				boolean isRemoved = false;
 				
-				if (isNone(lblAtt1.getText()) && isNone(lblAtt2.getText()) 
-						&& isNone(lblAtt3.getText()) && isNone(lblAtt4.getText())) {
+				if (isNone(lblAttr1.getText()) && isNone(lblAttr2.getText()) 
+						&& isNone(lblAttr3.getText()) && isNone(lblAttr4.getText())) {
 							JOptionPane.showMessageDialog(contentPane, "Slots are empty!");
 				} else {
 					do {
-						String message1 = """
-								<html>
-									Enter the number to remove a sub-stat and click '<b>OK</b>'
-									<br> <br>
-									<b>[1]</b> Slot 1 (%s) <br>
-									<b>[2]</b> Slot 2 (%s) <br>
-									<b>[3]</b> Slot 3 (%s) <br>
-									<b>[4]</b> Slot 4 (%s) <br>
-								</html>
-						""".formatted(lblAtt1.getText(), lblAtt2.getText(), lblAtt3.getText(), lblAtt4.getText());
+						String dialogMessage = "";
 						
-						String message2 = """
-								<html>
-									Enter the number to remove a sub-stat and click '<b>OK</b>'
-									<br> <br>
-									<b>[1]</b> Slot 1 (%s) <br>
-									<b>[2]</b> Slot 2 (%s) <br>
-								</html>
-						""".formatted(lblAtt1.getText(), lblAtt2.getText());
+						if (definedAffixMode) {
+							dialogMessage = """
+									<html>
+										<p>Enter the number to remove a sub-stat and click '<b>OK</b>'</p> <br>
+										<p>
+											<b>[1]</b> Slot 1 (%s) <br>
+											<b>[2]</b> Slot 2 (%s) <br>
+										</p>
+									</html>
+									""".formatted(lblAttr1.getText(), lblAttr2.getText());
+						} else {
+							dialogMessage = """
+									<html>
+										<p>Enter the number to remove a sub-stat and click '<b>OK</b>'</p> <br>
+										<p>
+											<b>[1]</b> Slot 1 (%s) <br>
+											<b>[2]</b> Slot 2 (%s) <br>
+											<b>[3]</b> Slot 3 (%s) <br>
+											<b>[4]</b> Slot 4 (%s) <br>
+										</p>
+									</html>
+									""".formatted(lblAttr1.getText(), lblAttr2.getText(), lblAttr3.getText(), lblAttr4.getText());
+						}
 						
-						String result = JOptionPane.showInputDialog(contentPane, 
-								definedAffixMode ? message2 : message1, "Remove Sub-Stat", JOptionPane.PLAIN_MESSAGE);
+						String result = JOptionPane.showInputDialog(contentPane, dialogMessage, "Remove Sub-Stat", JOptionPane.PLAIN_MESSAGE);
 						
-						if((result != null) && (result.length() > 0)) {
-							switch (result.trim()) {
-								case "1" -> {
-									removeStat(lblAtt1, cboValue1);
-									isRemoved = true;
-								}
-								case "2" -> {
-									removeStat(lblAtt2, cboValue2);
-									isRemoved = true;
-								}
-								case "3" -> {
-									if (!definedAffixMode) {
-										removeStat(lblAtt3, cboValue3);
+						if (result != null) {
+							result = result.trim();
+							
+							if (result.isBlank()) {
+								JOptionPane.showMessageDialog(contentPane, "Enter the slot number to remove the stat!");
+							} else {
+								switch (result) {
+									case "1" -> {
+										removeStat(lblAttr1, cboAttrValue1);
 										isRemoved = true;
-									} else {
-										JOptionPane.showMessageDialog(contentPane, "Enter a number only 1 and 2!");
 									}
-								}
-								case "4" -> {
-									if (!definedAffixMode) {
-										removeStat(lblAtt4, cboValue4);
+									case "2" -> {
+										removeStat(lblAttr2, cboAttrValue2);
 										isRemoved = true;
-									} else {
-										JOptionPane.showMessageDialog(contentPane, "Enter a number only 1 and 2!");
 									}
-								}
-								default -> {
-									JOptionPane.showMessageDialog(contentPane, 
-											"Enter a number only %s!".formatted(definedAffixMode ? "1 to 2" : "from 1 to 4"));
+									case "3" -> {
+										if (!definedAffixMode) {
+											removeStat(lblAttr3, cboAttrValue3);
+											isRemoved = true;
+										} else {
+											JOptionPane.showMessageDialog(contentPane, "Enter a number only 1 or 2!");
+										}
+									}
+									case "4" -> {
+										if (!definedAffixMode) {
+											removeStat(lblAttr4, cboAttrValue4);
+											isRemoved = true;
+										} else {
+											JOptionPane.showMessageDialog(contentPane, "Enter a number only 1 or 2!");
+										}
+									}
+									default -> {
+										JOptionPane.showMessageDialog(contentPane, 
+												"Enter a number only %s!".formatted(definedAffixMode ? "1 or 2" : "from 1 to 4"));
+									}
 								}
 							}
-						} else if(result == null) { // if CANCEL button is clicked and Window is CLOSED
+						} else { // if CANCEL button is clicked and Window is CLOSED
 							break; // stops the loop
-						} else if(result.isBlank()) {
-							JOptionPane.showMessageDialog(contentPane, "Enter the slot number to remove the stat!");
 						}
-					} while(!isRemoved);
+					} while (!isRemoved);
 				}
 			}
 		});
-		panelSetup.add(btnRemoveSubstat);
+		panelSetup.add(btnRemoveSubStat);
 		
 		btnRemoveAll = new JButton("Remove All");
 		btnRemoveAll.setFont(new Font("Segoe UI", Font.BOLD, 12));
 		btnRemoveAll.setBounds(393, 197, 125, 30);
 		btnRemoveAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (isNone(lblAtt1.getText()) && isNone(lblAtt2.getText()) 
-						&& isNone(lblAtt3.getText()) && isNone(lblAtt4.getText())) {
+				if (isNone(lblAttr1.getText()) && isNone(lblAttr2.getText()) 
+						&& isNone(lblAttr3.getText()) && isNone(lblAttr4.getText())) {
 					JOptionPane.showMessageDialog(contentPane, "There are no sub-stats!");
 				} else {
 					int response = JOptionPane.showConfirmDialog(contentPane, 
@@ -503,18 +520,18 @@ public class CustomStatDialog extends JDialog {
 					
 					if (response == JOptionPane.YES_OPTION) {
 						if (definedAffixMode) {							
-							lblAtt1.setText("None");
-							lblAtt2.setText("None");
+							lblAttr1.setText("None");
+							lblAttr2.setText("None");
 						} else {
-							lblAtt1.setText("None");
-							lblAtt2.setText("None");
-							lblAtt3.setText("None");
-							lblAtt4.setText("None");
+							lblAttr1.setText("None");
+							lblAttr2.setText("None");
+							lblAttr3.setText("None");
+							lblAttr4.setText("None");
 							
-							cboValue1.setModel(modelDefaultValue);
-							cboValue2.setModel(modelDefaultValue);
-							cboValue3.setModel(modelDefaultValue);
-							cboValue4.setModel(modelDefaultValue);
+							cboAttrValue1.setModel(modelDefaultValue);
+							cboAttrValue2.setModel(modelDefaultValue);
+							cboAttrValue3.setModel(modelDefaultValue);
+							cboAttrValue4.setModel(modelDefaultValue);
 						}
 						
 						JOptionPane.showMessageDialog(contentPane, "Sub-stats are removed!");
@@ -525,16 +542,16 @@ public class CustomStatDialog extends JDialog {
 		panelSetup.add(btnRemoveAll);
 	}
 	
-	private void removeStat(JLabel lblAtt, JComboBox<Double> cboValue) {
+	private void removeStat(JLabel lblAttr, JComboBox<Double> cboAttrValue) {
 		String temp = null;
 		
-		if(isNone(lblAtt.getText())) {
+		if (isNone(lblAttr.getText())) {
 			JOptionPane.showMessageDialog(contentPane, "The slot is empty!");
-			temp = lblAtt.getText();
+			temp = lblAttr.getText();
 		} else {
-			temp = lblAtt.getText();
-			lblAtt.setText("None");
-			cboValue.setModel(modelDefaultValue);
+			temp = lblAttr.getText();
+			lblAttr.setText("None");
+			cboAttrValue.setModel(modelDefaultValue);
 		}
 		
 		if (!temp.equals("None")) {
@@ -542,42 +559,42 @@ public class CustomStatDialog extends JDialog {
 		}
 	}
 	
-	private void addStat(JLabel lblAtt, String selectedAttribute, JComboBox<Double> cboValue) {
-		lblAtt.setText(selectedAttribute);
+	private void addStat(JLabel lblAttr, String selectedAttribute, JComboBox<Double> cboAttrValue) {
+		lblAttr.setText(selectedAttribute);
 		
 		if (!definedAffixMode) {
-			setValue(lblAtt, cboValue);
+			setValue(lblAttr, cboAttrValue);
 		}
 		
 		JOptionPane.showMessageDialog(contentPane, selectedAttribute + " is added!");
 	}
 	
-	private void setValue(JLabel lblAtt, JComboBox<Double> cboValue) throws IllegalArgumentException {
-		String attribute = lblAtt.getText();
+	private void setValue(JLabel lblAttr, JComboBox<Double> cboAttrValue) throws IllegalArgumentException {
+		String attributeName = lblAttr.getText();
 		
-		cboValue.setModel(switch (attribute) {
+		cboAttrValue.setModel(switch (attributeName) {
 		    case Attribute.HP_FLAT -> 
-		    	new DefaultComboBoxModel<>(artifact.getHpFlat());
+		    	new DefaultComboBoxModel<>(attribute.getHpFlat());
 		    case Attribute.ATK_FLAT -> 
-		    	new DefaultComboBoxModel<>(artifact.getAtkFlat());
+		    	new DefaultComboBoxModel<>(attribute.getAtkFlat());
 		    case Attribute.DEF_FLAT -> 
-		    	new DefaultComboBoxModel<>(artifact.getDefFlat());
+		    	new DefaultComboBoxModel<>(attribute.getDefFlat());
 		    case Attribute.HP_PER -> 
-		    	new DefaultComboBoxModel<>(artifact.getHpPer());
+		    	new DefaultComboBoxModel<>(attribute.getHpPer());
 		    case Attribute.ATK_PER -> 
-		    	new DefaultComboBoxModel<>(artifact.getAtkPer());
+		    	new DefaultComboBoxModel<>(attribute.getAtkPer());
 		    case Attribute.DEF_PER -> 
-		    	new DefaultComboBoxModel<>(artifact.getDefPer());
+		    	new DefaultComboBoxModel<>(attribute.getDefPer());
 		    case Attribute.ENERGY_RECHARGE -> 
-		    	new DefaultComboBoxModel<>(artifact.getEnergyRecharge());
+		    	new DefaultComboBoxModel<>(attribute.getEnergyRecharge());
 		    case Attribute.ELEMENTAL_MASTERY -> 
-		    	new DefaultComboBoxModel<>(artifact.getElementalMastery());
+		    	new DefaultComboBoxModel<>(attribute.getElementalMastery());
 		    case Attribute.CRIT_RATE -> 
-		    	new DefaultComboBoxModel<>(artifact.getCritRate());
+		    	new DefaultComboBoxModel<>(attribute.getCritRate());
 		    case Attribute.CRIT_DMG -> 
-		    	new DefaultComboBoxModel<>(artifact.getCritDamage());
+		    	new DefaultComboBoxModel<>(attribute.getCritDamage());
 		    default -> 
-		    	throw new IllegalArgumentException("Invalid attribute: " + attribute);
+		    	throw new IllegalArgumentException("Invalid attributeName: " + attributeName);
 		});
 	}
 	
@@ -585,31 +602,35 @@ public class CustomStatDialog extends JDialog {
 		String artifactPiece = (String) cboArtifactPiece.getSelectedItem();
         String mainAttribute = (String) cboMainStat.getSelectedItem();
 
-        String att1 = lblAtt1.getText();
-        String att2 = lblAtt2.getText();
-        String att3 = lblAtt3.getText().equals("None") ? null : lblAtt3.getText();
-        String att4 = lblAtt4.getText().equals("None") ? null : lblAtt4.getText();
+        String attr1 = lblAttr1.getText();
+        String attr2 = lblAttr2.getText();
+        String attr3 = lblAttr3.getText().equals("None") ? null : lblAttr3.getText();
+        String attr4 = lblAttr4.getText().equals("None") ? null : lblAttr4.getText();
 
-        double value1 = (double) cboValue1.getSelectedItem();
-        double value2 = (double) cboValue2.getSelectedItem();
-        double value3 = (double) cboValue3.getSelectedItem();
-        double value4 = (double) cboValue4.getSelectedItem();
+        double value1 = (double) cboAttrValue1.getSelectedItem();
+        double value2 = (double) cboAttrValue2.getSelectedItem();
+        double value3 = (double) cboAttrValue3.getSelectedItem();
+        double value4 = (double) cboAttrValue4.getSelectedItem();
 
-        objArtifactDisplayer.setArtifactPiece(artifactPiece);
-        objArtifactDisplayer.setMainAttribute(mainAttribute);
-        objArtifactDisplayer.setAttribute(att1, att2, att3, att4);
-        objArtifactDisplayer.setValue(value1, value2, value3, value4);
+        artifactStat.setArtifactPiece(artifactPiece);
+        artifactStat.setMainAttribute(mainAttribute);
+        artifactStat.updateArtifactSubStats(
+        		new ArtifactSubStat(attr1, value1), new ArtifactSubStat(attr2, value2),
+        		new ArtifactSubStat(attr3, value3), new ArtifactSubStat(attr4, value4)
+        );
 
-        if ((att1 != null && att2 != null) && (att3 == null || definedAffixMode)) {
-            objArtifactDisplayer.generateRandomCustomSubStats();
+        if ((attr1 != null && attr2 != null) && (attr3 == null || definedAffixMode)) {
+        	artifactStat.generateDefinedAffixModeSubStats();
         } else {
-            if (att4 == null) {
-                objArtifactDisplayer.setMaxUpgrade(4);
+            if (attr4 == null) {
+            	artifactStat.setMaxUpgrade(4);
             } else {
-                objArtifactDisplayer.setMaxUpgrade(5);
+            	artifactStat.setMaxUpgrade(5);
             }
-            objArtifactDisplayer.generateStats();
         }
+        
+        // clear the object
+        artifactStat = null;
 	}
 	
 	public static boolean getIsCustomStatDisplayed() {

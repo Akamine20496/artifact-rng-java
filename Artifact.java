@@ -1,149 +1,216 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-public final class Artifact extends Attribute {
+public final class Artifact {
 	public static final String FLOWER = "Flower of Life";
 	public static final String FEATHER = "Plume of Death";
 	public static final String SANDS = "Sands of Eon";
 	public static final String GOBLET = "Goblet of Eonothem";
 	public static final String CIRCLET = "Circlet of Logos";
 	
-	private final String[] PIECE = {
-			"Flower of Life", "Plume of Death", 
-			"Sands of Eon", "Goblet of Eonothem",
-			"Circlet of Logos"
+	public static final String[] MAIN_ATTRIBUTE_NAMES = {
+			Attribute.HP_FLAT, 
+			Attribute.ATK_FLAT, 
+			Attribute.HP_PER, 
+			Attribute.ATK_PER, 
+			Attribute.DEF_PER, 
+			Attribute.ENERGY_RECHARGE, 
+			Attribute.ELEMENTAL_MASTERY,
+			Attribute.CRIT_RATE, 
+			Attribute.CRIT_DMG,
+			Attribute.PYRO_DMG_BONUS, 
+			Attribute.ELECTRO_DMG_BONUS, 
+			Attribute.CRYO_DMG_BONUS,
+			Attribute.HYDRO_DMG_BONUS, 
+			Attribute.DENDRO_DMG_BONUS, 
+			Attribute.ANEMO_DMG_BONUS,
+			Attribute.GEO_DMG_BONUS, 
+			Attribute.PHYSICAL_DMG_BONUS, 
+			Attribute.HEALING_BONUS
 	};
-	private final String[] FLOWER_OF_LIFE = { "HP" };
-	private final String[] PLUME_OF_DEATH = { "ATK" };
-	private final String[] SANDS_OF_EON = { "HP%", "ATK%", "DEF%", "Energy Recharge%", "Elemental Mastery" };
-	private final String[] GOBLET_OF_EONOTHEM = {
-			"HP%", "ATK%", "DEF%", "Pyro DMG Bonus%", "Electro DMG Bonus%",
-			"Cryo DMG Bonus%", "Hydro DMG Bonus%", "Dendro DMG Bonus%", "Anemo DMG Bonus%", "Geo DMG Bonus%",
-			"Physical DMG Bonus%", "Elemental Mastery"
+	
+	private static final String[] ARTIFACT_PIECES = { 
+			FLOWER, 
+			FEATHER, 
+			SANDS, 
+			GOBLET, 
+			CIRCLET 
 	};
-	private final String[] CIRCLET_OF_LOGOS = {
-			"HP%", "ATK%", "DEF%", "Healing Bonus%", "Elemental Mastery",
-			"CRIT Rate%", "CRIT DMG%"
+	private static final String[] FLOWER_OF_LIFE = { Attribute.HP_FLAT };
+	private static final String[] PLUME_OF_DEATH = { Attribute.ATK_FLAT };
+	private static final String[] SANDS_OF_EON = { 
+			Attribute.HP_PER, 
+			Attribute.ATK_PER, 
+			Attribute.DEF_PER,
+			Attribute.ENERGY_RECHARGE, 
+			Attribute.ELEMENTAL_MASTERY
+	};
+	private static final String[] GOBLET_OF_EONOTHEM = {
+			Attribute.HP_PER,
+			Attribute.ATK_PER,
+			Attribute.DEF_PER,
+			Attribute.PYRO_DMG_BONUS,
+			Attribute.ELECTRO_DMG_BONUS,
+			Attribute.CRYO_DMG_BONUS,
+			Attribute.HYDRO_DMG_BONUS,
+			Attribute.DENDRO_DMG_BONUS,
+			Attribute.ANEMO_DMG_BONUS,
+			Attribute.GEO_DMG_BONUS,
+			Attribute.PHYSICAL_DMG_BONUS,
+			Attribute.ELEMENTAL_MASTERY
+	};
+	private static final String[] CIRCLET_OF_LOGOS = {
+			Attribute.HP_PER,
+			Attribute.ATK_PER,
+			Attribute.DEF_PER,
+			Attribute.HEALING_BONUS,
+			Attribute.ELEMENTAL_MASTERY,
+			Attribute.CRIT_RATE,
+			Attribute.CRIT_DMG
 	};
 	
-	private final AttributeStat FLOWER_STAT = new AttributeStat(Attribute.HP_FLAT);
-	private final AttributeStat FEATHER_STAT = new AttributeStat(Attribute.ATK_FLAT);
+	private final String FLOWER_STAT = Attribute.HP_FLAT;
+	private final String FEATHER_STAT = Attribute.ATK_FLAT;
 	
-	private final List<ProbabilityStat> listSands = Arrays.asList(
-			new ProbabilityStat(Attribute.HP_PER, 26.68),
-			new ProbabilityStat(Attribute.ATK_PER, 26.66),
-			new ProbabilityStat(Attribute.DEF_PER, 26.66),
-			new ProbabilityStat(Attribute.ENERGY_RECHARGE, 10.00),
-			new ProbabilityStat(Attribute.ELEMENTAL_MASTERY, 10.00)
+	private final List<AttributeProbabilityStat> LIST_SANDS_STATS = Arrays.asList(
+			new AttributeProbabilityStat(Attribute.HP_PER, 26.68),
+			new AttributeProbabilityStat(Attribute.ATK_PER, 26.66),
+			new AttributeProbabilityStat(Attribute.DEF_PER, 26.66),
+			new AttributeProbabilityStat(Attribute.ENERGY_RECHARGE, 10.00),
+			new AttributeProbabilityStat(Attribute.ELEMENTAL_MASTERY, 10.00)
 	);
-	private final List<ProbabilityStat> listGoblet = Arrays.asList(
-			new ProbabilityStat(Attribute.HP_PER, 19.25),
-			new ProbabilityStat(Attribute.ATK_PER, 19.25),
-			new ProbabilityStat(Attribute.DEF_PER, 19.00),
-			new ProbabilityStat(Attribute.PYRO_DMG_BONUS, 5.00),
-			new ProbabilityStat(Attribute.ELECTRO_DMG_BONUS, 5.00),
-			new ProbabilityStat(Attribute.CRYO_DMG_BONUS, 5.00),
-			new ProbabilityStat(Attribute.HYDRO_DMG_BONUS, 5.00),
-			new ProbabilityStat(Attribute.DENDRO_DMG_BONUS, 5.00),
-			new ProbabilityStat(Attribute.ANEMO_DMG_BONUS, 5.00),
-			new ProbabilityStat(Attribute.GEO_DMG_BONUS, 5.00),
-			new ProbabilityStat(Attribute.PHYSICAL_DMG_BONUS, 5.00),
-			new ProbabilityStat(Attribute.ELEMENTAL_MASTERY, 2.50)
+	private final List<AttributeProbabilityStat> LIST_GOBLET_STATS = Arrays.asList(
+			new AttributeProbabilityStat(Attribute.HP_PER, 19.25),
+			new AttributeProbabilityStat(Attribute.ATK_PER, 19.25),
+			new AttributeProbabilityStat(Attribute.DEF_PER, 19.00),
+			new AttributeProbabilityStat(Attribute.PYRO_DMG_BONUS, 5.00),
+			new AttributeProbabilityStat(Attribute.ELECTRO_DMG_BONUS, 5.00),
+			new AttributeProbabilityStat(Attribute.CRYO_DMG_BONUS, 5.00),
+			new AttributeProbabilityStat(Attribute.HYDRO_DMG_BONUS, 5.00),
+			new AttributeProbabilityStat(Attribute.DENDRO_DMG_BONUS, 5.00),
+			new AttributeProbabilityStat(Attribute.ANEMO_DMG_BONUS, 5.00),
+			new AttributeProbabilityStat(Attribute.GEO_DMG_BONUS, 5.00),
+			new AttributeProbabilityStat(Attribute.PHYSICAL_DMG_BONUS, 5.00),
+			new AttributeProbabilityStat(Attribute.ELEMENTAL_MASTERY, 2.50)
 	);
-	private final List<ProbabilityStat> listCirclet = Arrays.asList(
-			new ProbabilityStat(Attribute.HP_PER, 22.00),
-			new ProbabilityStat(Attribute.ATK_PER, 22.00),
-			new ProbabilityStat(Attribute.DEF_PER, 22.00),
-			new ProbabilityStat(Attribute.CRIT_RATE, 10.00),
-			new ProbabilityStat(Attribute.CRIT_DMG, 10.00),
-			new ProbabilityStat(Attribute.HEALING_BONUS, 10.00),
-			new ProbabilityStat(Attribute.ELEMENTAL_MASTERY, 4.00)
-	);
-	
-	private final List<WeightedStat> listStatWeight = Arrays.asList(
-			new WeightedStat(Attribute.HP_FLAT, 6),
-			new WeightedStat(Attribute.ATK_FLAT, 6),
-			new WeightedStat(Attribute.DEF_FLAT, 6),
-			new WeightedStat(Attribute.HP_PER, 4),
-			new WeightedStat(Attribute.ATK_PER, 4),
-			new WeightedStat(Attribute.DEF_PER, 4),
-			new WeightedStat(Attribute.ENERGY_RECHARGE, 4),
-			new WeightedStat(Attribute.ELEMENTAL_MASTERY, 4),
-			new WeightedStat(Attribute.CRIT_RATE, 3),
-			new WeightedStat(Attribute.CRIT_DMG, 3)
+	private final List<AttributeProbabilityStat> LIST_CIRCLET_STATS = Arrays.asList(
+			new AttributeProbabilityStat(Attribute.HP_PER, 22.00),
+			new AttributeProbabilityStat(Attribute.ATK_PER, 22.00),
+			new AttributeProbabilityStat(Attribute.DEF_PER, 22.00),
+			new AttributeProbabilityStat(Attribute.CRIT_RATE, 10.00),
+			new AttributeProbabilityStat(Attribute.CRIT_DMG, 10.00),
+			new AttributeProbabilityStat(Attribute.HEALING_BONUS, 10.00),
+			new AttributeProbabilityStat(Attribute.ELEMENTAL_MASTERY, 4.00)
 	);
 	
+	private final List<AttributeWeightStat> LIST_WEIGHTED_STATS = Arrays.asList(
+			new AttributeWeightStat(Attribute.HP_FLAT, 6),
+			new AttributeWeightStat(Attribute.ATK_FLAT, 6),
+			new AttributeWeightStat(Attribute.DEF_FLAT, 6),
+			new AttributeWeightStat(Attribute.HP_PER, 4),
+			new AttributeWeightStat(Attribute.ATK_PER, 4),
+			new AttributeWeightStat(Attribute.DEF_PER, 4),
+			new AttributeWeightStat(Attribute.ENERGY_RECHARGE, 4),
+			new AttributeWeightStat(Attribute.ELEMENTAL_MASTERY, 4),
+			new AttributeWeightStat(Attribute.CRIT_RATE, 3),
+			new AttributeWeightStat(Attribute.CRIT_DMG, 3)
+	);
 	
-	public String[] getPiece() {
-		return PIECE;
+	private Random rand = new Random();
+	private Attribute attribute = Attribute.getInstance();
+	
+	public String[] getArtifactPiece() {
+		return ARTIFACT_PIECES;
 	}
 	
-	public String[] getFlower() {
+	public String[] getFlowerPiece() {
 		return FLOWER_OF_LIFE;
 	}
 	
-	public String[] getFeather() {
+	public String[] getFeatherPiece() {
 		return PLUME_OF_DEATH;
 	}
 	
-	public String[] getSands() {
+	public String[] getSandsPiece() {
 		return SANDS_OF_EON;
 	}
 	
-	public String[] getGoblet() {
+	public String[] getGobletPiece() {
 		return GOBLET_OF_EONOTHEM;
 	}
 	
-	public String[] getCirclet() {
+	public String[] getCircletPiece() {
 		return CIRCLET_OF_LOGOS;
 	}
 	
+	public String[] getMainAttributeNames() {
+		return MAIN_ATTRIBUTE_NAMES;
+	}
+	
+	// RESPONSIBLE FOR GENERATING SPECIFIC PARTS
+	
 	public String generateRandomPiece() {
-		List<String> listPiece = Arrays.asList(FLOWER, FEATHER, SANDS, GOBLET, CIRCLET);
-		int randomIndex = new Random().nextInt(listPiece.size());
-		return listPiece.get(randomIndex);
+		int randomIndex = rand.nextInt(ARTIFACT_PIECES.length);
+		return ARTIFACT_PIECES[randomIndex];
 	}
 	
 	public String generateMainAttribute(String artifactPiece) throws IllegalArgumentException {
 		return switch (artifactPiece) {
-			case FLOWER ->
-				FLOWER_STAT.getAttribute();
-			case FEATHER ->
-				FEATHER_STAT.getAttribute();
-			case SANDS ->
-				generatedAttribute(listSands);
-			case GOBLET ->
-				generatedAttribute(listGoblet);
-			case CIRCLET ->
-				generatedAttribute(listCirclet);
-			default ->
-				// Throw an exception if none of the cases is met
-				throw new IllegalArgumentException("Invalid artifact piece: " + artifactPiece);
+			case FLOWER -> FLOWER_STAT;
+			case FEATHER -> FEATHER_STAT;
+			case SANDS -> generateAttributeName(LIST_SANDS_STATS);
+			case GOBLET -> generateAttributeName(LIST_GOBLET_STATS);
+			case CIRCLET -> generateAttributeName(LIST_CIRCLET_STATS);
+			// Throw an exception if none of the cases is met
+			default -> throw new IllegalArgumentException("Invalid artifactPiece: " + artifactPiece);
 		};
 	}
 	
-	public String generateSubAttribute(String... attributes) throws NullPointerException {
-		List<String> notSpecialAttributes = new ArrayList<>();
+	public String generateSubAttribute(String... attributeNames) throws NullPointerException {
+		List<String> notSpecialAttributeNames = new ArrayList<>();
 		
-		for (String attribute : attributes) {
-			if (attribute == null) {
-				throw new NullPointerException("Attribute must not be null.");
+		for (String attributeName : attributeNames) {
+			if (attributeName == null) {
+				throw new NullPointerException("attributeName must not be null.");
 			}
 			
-			if (isNotSpecialAttribute(attribute)) {
-				notSpecialAttributes.add(attribute);
+			if (attribute.isNotSpecialAttributeName(attributeName)) {
+				notSpecialAttributeNames.add(attributeName);
 			}
 		}
 		
-		List<ProbabilityStat> statsList = getStatProbabilityList(notSpecialAttributes);
+		List<AttributeProbabilityStat> listStats = getStatProbabilityList(notSpecialAttributeNames);
 		
 		// for debugging purposes
-		checkIfHundredPercent(statsList);
+		checkIfHundredPercent(listStats);
 		
-		return generatedAttribute(statsList);
+		return generateAttributeName(listStats);
+	}
+	
+	public ArtifactSubStat generateSubStat(String... attributeNames) throws NullPointerException {
+		List<String> notSpecialAttributeNames = new ArrayList<>();
+		
+		for (String attributeName : attributeNames) {
+			if (attributeName == null) {
+				throw new NullPointerException("attributeName must not be null.");
+			}
+			
+			if (attribute.isNotSpecialAttributeName(attributeName)) {
+				notSpecialAttributeNames.add(attributeName);
+			}
+		}
+		
+		List<AttributeProbabilityStat> listStats = getStatProbabilityList(notSpecialAttributeNames);
+		
+		// for debugging purposes
+		checkIfHundredPercent(listStats);
+		
+		String generatedAttributeName = generateAttributeName(listStats);
+		double generatedAttributeValue = generateSubAttributeValue(generatedAttributeName);
+		
+		return new ArtifactSubStat(generatedAttributeName, generatedAttributeValue);
 	}
 	
 	public int generateMaxUpgrade() {
@@ -158,8 +225,8 @@ public final class Artifact extends Attribute {
 		}
 	}
 	
-	public int generateNoOfUpgrade() {
-		double upgradeChance = Double.valueOf("%.2f".formatted(generateNumber() - 0.01));
+	public int generateUpgradeTimes() {
+		double upgradeTimesChance = generateNumber(99.99);
 		
 		int[] upgradeTimes = { 0, 1, 2, 3, 4, 5 };
 		double[] probabilities = { 23.73, 39.55, 26.37, 8.79, 1.46, 0.09 };
@@ -168,7 +235,7 @@ public final class Artifact extends Attribute {
 		for (int i = 0; i <= upgradeTimes.length; i++) {
 			cumulativeProbability += probabilities[i];
 			
-			if (upgradeChance <= cumulativeProbability) {
+			if (upgradeTimesChance <= cumulativeProbability) {
 				return upgradeTimes[i];
 			}
 		}
@@ -196,9 +263,9 @@ public final class Artifact extends Attribute {
 		return slots[0];
 	}
 	
-	public double generateValue(String attribute) throws IllegalArgumentException {
-		if (attribute == null) {
-			throw new NullPointerException("Attribute must not be null");
+	public double generateSubAttributeValue(String attributeName) throws NullPointerException, IllegalArgumentException {
+		if (attributeName == null) {
+			throw new NullPointerException("attributeName must not be null");
 		}
 		
 		// "ATK%", "HP%", "DEF%", "ATK", "HP", "DEF", "Energy Recharge", "Elemental Mastery", "Crit Rate", "Crit Damage"
@@ -212,169 +279,331 @@ public final class Artifact extends Attribute {
 		 * 25% chance 70% value of the max stat
 		 */
 		
-		for (ValueStat currentStat : Attribute.VALUE_STATS) {
-			if (currentStat.getAttribute().equals(attribute)) {
-				return generatedValue(currentStat.getValues());
-			}
-		}
-		
-		// Throw an exception if we reach here meaning that the attribute is not in the array of stats
-		throw new IllegalArgumentException("Invalid attribute: " + attribute);
+		return generateAttributeValue(attribute.getAttributeValues(attributeName));
 	}
 	
-	public String formatText(String attribute) {
-		if (attribute == null) {
-			throw new NullPointerException("Attribute must not be null");
-		}
-		
-		// checks if the attribute is percentage
-		if (attribute.substring(attribute.length() - 1).equals("%")) {
-			return attribute.substring(0, attribute.length() - 1);
-		}
-		
-		// return the flat attribute
-		return attribute;
-	}
-	
-	public String formatText(String attribute, double value) {
-		if (attribute == null) {
-			throw new NullPointerException("Attribute must not be null");
-		}
-		
-		// checks if the attribute is percentage
-		if (attribute.substring(attribute.length() - 1).equals("%")) {
-			String modifiedAtt = attribute.substring(0, attribute.length() - 1);
-			return String.format("%s+%.1f%%", modifiedAtt, value);
-		}
-		
-		// return the flat attribute
-		return String.format("%s+%d", attribute, Math.round(value));
-	}
-	
-	public String formatText(String attribute, double prevValue, double currValue) {
-		if (attribute == null) {
-			throw new NullPointerException("Attribute must not be null");
-		}
-		
-		// checks if the attribute is percentage
-		if (attribute.substring(attribute.length() - 1).equals("%")) {
-			String modifiedAtt = attribute.substring(0, attribute.length() - 1);
-			return String.format("%s    %.1f%% ---> %.1f%%", modifiedAtt, prevValue, currValue);
-		}
-		
-		// return the flat attribute
-		return String.format("%s    %d ---> %d", attribute, Math.round(prevValue), Math.round(currValue));
-	}
-	
-	public String formatValue(String attribute, double value) {
-		if (attribute == null) {
-			throw new NullPointerException("Attribute must not be null");
-		}
-		
-		// checks if the attribute is percentage
-		if (attribute.substring(attribute.length() - 1).equals("%")) {
-			return String.format("%.1f%%", value);
-		}
-		
-		// return the flat attribute
-		return String.valueOf(Math.round(value));
-	}
-	
-	private void checkIfHundredPercent(List<ProbabilityStat> listStats) {
+	private void checkIfHundredPercent(List<AttributeProbabilityStat> listStats) {
 		double totalProbability = 0;
 		
-		for (ProbabilityStat currentStat : listStats) {
-			totalProbability += currentStat.getProbability();
+		for (AttributeProbabilityStat currentStat : listStats) {
+			totalProbability += currentStat.getAttributeProbability();
 		}
 		
-		System.out.format("%nFrom %s%nTotal Probability is %.2f%%%n%n", listStats.toString(), totalProbability);
+		System.out.format("%n%s%nTotal Probability is %.2f%%%n%n", listStats.toString(), totalProbability);
 	}
 	
-	private List<ProbabilityStat> getStatProbabilityList(List<String> attributes) {
-		List<WeightedStat> notExistingStats = new ArrayList<>();
-		List<ProbabilityStat> selectedStats = new ArrayList<>();
+	private List<AttributeProbabilityStat> getStatProbabilityList(List<String> listAttributeNames) {
+		List<AttributeProbabilityStat> selectedStats = new ArrayList<>();
 		
-		for (WeightedStat currentStat : listStatWeight) {
-			if (!attributes.contains(currentStat.getAttribute())) {
-				notExistingStats.add(currentStat);
+		for (AttributeWeightStat currentWeightedStat : LIST_WEIGHTED_STATS) {
+			if (!listAttributeNames.contains(currentWeightedStat.getAttributeName())) {
+				AttributeProbabilityStat probabilityStat = calculateStatProbability(currentWeightedStat, listAttributeNames);
+				selectedStats.add(probabilityStat);
 			}
-		}
-		
-		for (WeightedStat currentStat : notExistingStats) {
-			selectedStats.add(calculateStatProbability(currentStat, attributes));
 		}
 		
 		return selectedStats;
 	}
 	
-	private ProbabilityStat calculateStatProbability(WeightedStat targetWeightedStat, List<String> existingStats) throws NullPointerException, IllegalArgumentException {
+	private AttributeProbabilityStat calculateStatProbability(AttributeWeightStat targetWeightedStat, List<String> listAttributeNames) throws NullPointerException, IllegalArgumentException {
+		boolean isFound = false;
+        int totalWeight = 0;
+		
 		// verify the targetWeightedStat and existingStats
-		if (targetWeightedStat == null || existingStats == null) {
+		if (targetWeightedStat == null || listAttributeNames == null) {
         	throw new NullPointerException("Requires non-null object");
         }
-				
-        int totalWeight = 0;
         
         // verify the targetWeightedStat
-        if (!Arrays.asList(Attribute.ATTRIBUTES).contains(targetWeightedStat.getAttribute())) {
-        	throw new IllegalArgumentException("Invalid attribute: " + targetWeightedStat.getAttribute());
-        }
-        
-        // Calculate the total weight of available sub-stats (excluding the ones already existing)
-        for (WeightedStat currentStat : listStatWeight) {
-        	if (!existingStats.contains(currentStat.getAttribute())) {
-        		totalWeight += currentStat.getWeight();
+        for (String attributeName : Attribute.ATTRIBUTE_NAMES) {
+        	if (attributeName.equals(targetWeightedStat.getAttributeName())) {
+        		isFound = true;
+        		break;
         	}
         }
         
-        double probability = (double) targetWeightedStat.getWeight() / totalWeight * 100;
+        if (!isFound) {
+        	throw new IllegalArgumentException("Invalid attributeName: " + targetWeightedStat.getAttributeName());
+        }
         
-        return new ProbabilityStat(targetWeightedStat.getAttribute(), probability);
+        // Calculate the total weight of available sub-stats (excluding the ones already existing)
+        for (AttributeWeightStat currentWeightedStat : LIST_WEIGHTED_STATS) {
+        	if (!listAttributeNames.contains(currentWeightedStat.getAttributeName())) {
+        		totalWeight += currentWeightedStat.getAttributeWeight();
+        	}
+        }
+        
+        double probability = (double) targetWeightedStat.getAttributeWeight() / totalWeight * 100;
+        
+        return new AttributeProbabilityStat(targetWeightedStat.getAttributeName(), probability);
     }
 	
-	// GENERATING RANDOM ATTRIBUTE
+	// RESPONSIBLE FOR CHECKING GENUINE ARTIFACT NAMES
 	
-	private String generatedAttribute(List<ProbabilityStat> listAttribute) {
+	public boolean isAttributeNamePercentage(String attributeName) throws NullPointerException {
+		if (attributeName == null) {
+			throw new NullPointerException("attributeName must not be null");
+		}
+		
+		return attributeName.contains("%");
+	}
+	
+	public String isArtifactPiece(String artifactPieceName) throws NullPointerException, IllegalArgumentException {
+		if (artifactPieceName == null) {
+			return artifactPieceName;
+		}
+		
+		boolean isArtifactPiece = false;
+		
+		// check if artifact piece
+		for (String currArtifactPiece : ARTIFACT_PIECES) {
+			if (currArtifactPiece.equals(artifactPieceName)) {
+				isArtifactPiece = true;
+				break;
+			}
+		}
+		
+		if (isArtifactPiece) {
+			return artifactPieceName;
+		} else {
+			throw new IllegalArgumentException("Invalid artifactPieceName: " + artifactPieceName);
+		}
+	}
+	
+	public String isMainAttribute(String mainAttributeName) throws NullPointerException, IllegalArgumentException {
+		if (mainAttributeName == null) {
+			return mainAttributeName;
+		}
+		
+		boolean isMainAttribute = false;
+		
+		// check if main attribute
+		for (String currMainAttribute : MAIN_ATTRIBUTE_NAMES) {
+			if (currMainAttribute.equals(mainAttributeName)) {
+				isMainAttribute = true;
+				break;
+			}
+		}
+		
+		if (isMainAttribute) {
+			return mainAttributeName;
+		} else {
+			throw new IllegalArgumentException("Invalid mainAttributeName: " + mainAttributeName);
+		}
+	}
+	
+	public String isSubAttribute(String subAttributeName) throws IllegalArgumentException {
+		if (subAttributeName == null) {
+			return subAttributeName;
+		}
+		
+		boolean isSubAttribute = false;
+		
+		// check if main attribute
+		for (String currSubAttribute : Attribute.ATTRIBUTE_NAMES) {
+			if (currSubAttribute.equals(subAttributeName)) {
+				isSubAttribute = true;
+				break;
+			}
+		}
+		
+		if (isSubAttribute) {
+			return subAttributeName;
+		} else {
+			StringBuilder sb = new StringBuilder();
+			sb.append("Invalid subAttributeName: ").append(subAttributeName);
+			sb.append(". If this is valid, it's case sensitive and must exact name to the game.").append("\nValid Sub Attribute Name: ");
+			
+			for (String currSubAttribute : Attribute.ATTRIBUTE_NAMES) {
+				sb.append(currSubAttribute).append(", ");
+			}
+			
+			throw new IllegalArgumentException(sb.toString());
+		}
+	}
+	
+	public double isSubAttributeValue(String subAttributeName, double subAttributeValue) {
+		if (subAttributeName == null || subAttributeValue == 0) {
+			return subAttributeValue;
+		}
+		
+		boolean isSubAttributeValue = false;
+		
+		double[] attributeValues = attribute.getAttributeValues(subAttributeName);
+		
+		for (double attributeValue : attributeValues) {
+			if (attributeValue == subAttributeValue) {
+				isSubAttributeValue = true;
+				break;
+			}
+		}
+		
+		if (isSubAttributeValue) {
+			return subAttributeValue;
+		} else {
+			StringBuilder sb = new StringBuilder();
+			sb.append("Invalid subAttributeValue: ").append(subAttributeValue).append(", it's not a value from ");
+			sb.append(subAttributeName).append('.').append("\nValid Values of ").append(subAttributeName).append(": ");
+			
+			for (double attributeValue : attributeValues) {
+				sb.append(attributeValue).append(", ");
+			}
+			
+			throw new IllegalArgumentException(sb.toString());
+		}
+	}
+	
+	// RESPONSIBLE FOR FORMATTING SUB-STAT
+	
+	/**
+	 * Formats Sub-Stat
+	 * @param mode 0 = new, 1 = displaying, 2 = upgrade 
+	 * @param artifactSubStat ArtifactSubStat class
+	 * @return depending on the mode chosen
+	 * @throws NullPointerException
+	 */
+	public String formatSubStat(int mode, ArtifactSubStat artifactSubStat) throws NullPointerException, IllegalArgumentException {
+		if (artifactSubStat == null) {
+			throw new NullPointerException("artifactSubStat must not be null");
+		}
+		
+		return switch (mode) {
+			case 0 -> 
+				formatNewSubStat(artifactSubStat.getAttributeName(), artifactSubStat.getAttributeValue());
+			case 1 -> 
+				formatSubStat(artifactSubStat.getAttributeName(), artifactSubStat.getAttributeValue());
+			case 2 -> 
+				formatSubStat(artifactSubStat.getAttributeName(), artifactSubStat.getInitialAttributeValue(), artifactSubStat.getAttributeValue());
+			default -> 
+				throw new IllegalArgumentException("Invalid mode: " + mode);
+		};
+	}
+	
+	public String formatSubStat(String attributeName) throws NullPointerException {
+		if (attributeName == null) {
+			throw new NullPointerException("attributeName must not be null");
+		}
+		
+		// checks if the attribute name is percentage
+		if (isAttributeNamePercentage(attributeName)) {
+			return attributeName.substring(0, attributeName.length() - 1);
+		}
+		
+		// return the flat attribute name
+		return attributeName;
+	}
+	
+	public String formatSubStat(String attributeName, double attributeValue) throws NullPointerException {
+		if (attributeName == null) {
+			throw new NullPointerException("attributeName must not be null");
+		}
+		
+		// checks if the attribute name is percentage
+		if (isAttributeNamePercentage(attributeName)) {
+			return String.format("%s+%.1f%%", formatSubStat(attributeName), attributeValue);
+		}
+		
+		// return the flat sub-stat
+		return String.format("%s+%d", attributeName, Math.round(attributeValue));
+	}
+	
+	public String formatSubStat(String attributeName, double prevAttributeValue, double currAttributeValue) throws NullPointerException {
+		if (attributeName == null) {
+			throw new NullPointerException("attributeName must not be null");
+		}
+		
+		// checks if the attribute name is percentage
+		if (isAttributeNamePercentage(attributeName)) {
+			return String.format("%-20s %5.1f%% ---> %.1f%%", formatSubStat(attributeName), prevAttributeValue, currAttributeValue);
+		}
+		
+		// return the flat sub-stat
+		return String.format("%-20s %5d ---> %d", attributeName, Math.round(prevAttributeValue), Math.round(currAttributeValue));
+	}
+	
+	public String formatNewSubStat(String attributeName, double attributeValue) throws NullPointerException {
+		if (attributeName == null) {
+			throw new NullPointerException("attributeName must not be null");
+		}
+		
+		// checks if the attribute name is percentage
+		if (isAttributeNamePercentage(attributeName)) {
+			return String.format("%-25s ----- %.1f%%", formatSubStat(attributeName), attributeValue);
+		}
+		
+		return String.format("%-25s ----- %d", formatSubStat(attributeName), Math.round(attributeValue));
+	}
+	
+	public String formatSubStatValue(String attributeName, double attributeValue) throws NullPointerException {
+		if (attributeName == null) {
+			throw new NullPointerException("attributeName must not be null");
+		}
+		
+		// checks if the attribute name is percentage
+		if (isAttributeNamePercentage(attributeName)) {
+			return String.format("%.1f%%", attributeValue);
+		}
+		
+		// return the flat value
+		return String.valueOf(Math.round(attributeValue));
+	}
+	
+	// GENERATING RANDOM ATTRIBUTE NAME
+	
+	private String generateAttributeName(List<AttributeProbabilityStat> listAttribute) {
 		double attributeChance = generateNumber();
 		double cumulativeProbability = 0;
 		
 		for (int i = 0; i < listAttribute.size(); i++) {
-			ProbabilityStat currentStat = listAttribute.get(i);
-			cumulativeProbability += currentStat.getProbability();
+			AttributeProbabilityStat currentStat = listAttribute.get(i);
+			cumulativeProbability += currentStat.getAttributeProbability();
 			
 			if(attributeChance <= cumulativeProbability) {
-				return currentStat.getAttribute();
+				return currentStat.getAttributeName();
 			}
 		}
 		
 		// If we reach here, something went wrong, just return the first element
-		return listAttribute.get(0).getAttribute();
+		return listAttribute.get(0).getAttributeName();
 	}
 	
-	// ATTRIBUTE VALUE
+	// GENERATING RANDOM ATTRIBUTE VALUE
 	
-	private double generatedValue(double[] attributeValue) {
+	private double generateAttributeValue(double[] attributeValues) {
 		double valueChance = generateNumber();
 		double[] probabilities = { 25.00, 25.00, 25.00, 25.00 };
 		double cumulativeProbability = 0;
 		
-		for (int i = 0; i < attributeValue.length; i++) {
+		for (int i = 0; i < attributeValues.length; i++) {
 			cumulativeProbability += probabilities[i];
 			
 			if (valueChance <= cumulativeProbability) {
-				return attributeValue[i];
+				return attributeValues[i];
 			}
 		}
 		
 		// If we reach here, something went wrong, so just return the last element
-		return attributeValue[0];
+		return attributeValues[0];
 	}
 	
 	// NUMBER GENERATOR
-	// Generates number from 0.00 to 100.00
 	public double generateNumber() {
-		int min = 0;
-		int max = 100;
-		return Double.valueOf("%.2f".formatted(new Random().nextDouble() * (max - min) + min));
+		double min = 0;
+		double max = 100;
+		double randomValue = rand.nextDouble() * (max - min) + min;
+		// round to 2 decimal places
+		return Math.round(randomValue * 100.0) / 100.0;
+	}
+	
+	public double generateNumber(double maxNumber) {
+		if (maxNumber <= 0) {
+			throw new IllegalArgumentException("Number cannot go below starting at 0");
+		}
+		
+		double min = 0;
+		double max = maxNumber;
+		double randomValue = rand.nextDouble() * (max - min) + min;
+		// round to 2 decimal places
+		return Math.round(randomValue * 100.0) / 100.0;
 	}
 }

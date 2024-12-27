@@ -23,9 +23,19 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.JCheckBox;
 
+/**
+ * Artifact Roll Simulator from Genshin Impact
+ * @author AKAMiNE
+ */
 public class ArtifactSimulator extends JFrame {
-	private ArtifactDisplayerPanel objArtifactDisplayer = new ArtifactDisplayerPanel();
+	/**
+	 * Serial Version UID
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private Frame frameAncestor;
+	private ArtifactStat artifactStat = new ArtifactStat();
+	private ArtifactDisplayerPanel artifactDisplayerPanel;
 	private JPanel contentPane;
 	private JComboBox<String> cboArtifactPiece;
 	private JPanel panelControls;
@@ -59,7 +69,7 @@ public class ArtifactSimulator extends JFrame {
 					
 					InstructionDialog.showMessageDialog(frame, frame.getTitle(), frame.displayArtifactSimulatorMessage());
 				} catch (Exception e) {
-					JOptionPane.showMessageDialog(frame != null ? frame : null, e.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(frame == null ? null : frame, e.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -82,8 +92,10 @@ public class ArtifactSimulator extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(null);
 		setContentPane(contentPane);
-		contentPane.add(objArtifactDisplayer);
-		frameAncestor = (Frame) SwingUtilities.getWindowAncestor(contentPane);
+		frameAncestor = (Frame) SwingUtilities.getWindowAncestor(contentPane);		
+		
+		artifactDisplayerPanel = new ArtifactDisplayerPanel(artifactStat);
+		contentPane.add(artifactDisplayerPanel);
 		
 		panelControls = new JPanel();
 		panelControls.setBackground(new Color(192, 192, 192));
@@ -97,7 +109,33 @@ public class ArtifactSimulator extends JFrame {
 		btnLock.setBounds(189, 45, 113, 30);
 		btnLock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				lockComponent();
+				if (isLock) {
+					btnCustomStat.setEnabled(true);
+					cboArtifactPiece.setEnabled(false);
+					
+					if (chkRandomStat.isSelected()) {
+						chkRandomStat.setEnabled(false);
+						chkFullUpgrade.setEnabled(false);
+					} else {
+						chkRandomStat.setEnabled(false);
+					}
+					
+					isLock = false;
+					btnLock.setText("Unlock");
+				} else {
+					btnCustomStat.setEnabled(false);
+					cboArtifactPiece.setEnabled(true);			
+					
+					if (chkRandomStat.isSelected()) {
+						chkRandomStat.setEnabled(true);
+						chkFullUpgrade.setEnabled(true);
+					} else {
+						chkRandomStat.setEnabled(true);
+					}
+					
+					isLock = true;
+					btnLock.setText("Lock");
+				}
 			}
 		});
 		panelControls.add(btnLock);
@@ -107,51 +145,15 @@ public class ArtifactSimulator extends JFrame {
 		btnGenerate.setBounds(30, 120, 113, 30);
 		btnGenerate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (isLock && chkRandomStat.isSelected()) {
-					objArtifactDisplayer.setArtifactPiece(new Artifact().generateRandomPiece());
-					objArtifactDisplayer.generateStats();
-					
-					maxUpgrade = objArtifactDisplayer.getMaxUpgrade();
-					lblStatus.setText("Max Upgrade : " + maxUpgrade);
-					
-					cboArtifactPiece.setEnabled(false);
-					btnGenerate.setEnabled(false);
-					btnLock.setEnabled(false);
-					btnSkip.setEnabled(true);
-					btnRoll.setEnabled(true);
-					btnReset.setEnabled(true);
-					btnCustomStat.setEnabled(false);
-										
-					chkRandomStat.setEnabled(false);
-					chkFullUpgrade.setEnabled(false);
-					
-					if (chkRandomStat.isSelected() && chkFullUpgrade.isSelected()) {
-						// Invoke btnSkip click event
-						ActionEvent event = new ActionEvent(btnSkip, ActionEvent.ACTION_PERFORMED, null);
-						btnSkip.getActionListeners()[0].actionPerformed(event);
-					} else {
-						JOptionPane.showMessageDialog(contentPane, "Stats has been generated!");
-						btnRoll.requestFocus();
-					}
-				} else if(isLock) {
-					JOptionPane.showMessageDialog(contentPane, "Click the 'Lock' first.");
-				} else {
-					String selectedPiece = (String) cboArtifactPiece.getSelectedItem();
-					objArtifactDisplayer.setArtifactPiece(selectedPiece);
-					objArtifactDisplayer.generateStats();
-					
-					maxUpgrade = objArtifactDisplayer.getMaxUpgrade();
-					lblStatus.setText("Max Upgrade : " + maxUpgrade);
-					
-					btnGenerate.setEnabled(false);
-					btnLock.setEnabled(false);
-					btnSkip.setEnabled(true);
-					btnRoll.setEnabled(true);
-					btnReset.setEnabled(true);
-					btnCustomStat.setEnabled(false);
-					JOptionPane.showMessageDialog(contentPane, "Stats has been generated!");
-					btnRoll.requestFocus();
-				}
+				if (isLock) {
+			        if (chkRandomStat.isSelected()) {
+			            handleRandomStatGeneration();
+			        } else {
+			            JOptionPane.showMessageDialog(contentPane, "Click the 'Lock' first.");
+			        }
+			    } else {
+			        handleStatGeneration();
+			    }
 			}
 		});
 		panelControls.add(btnGenerate);
@@ -173,14 +175,18 @@ public class ArtifactSimulator extends JFrame {
 				}
 				
 				lblStatus.setText("Max Upgrade : 0");
-				objArtifactDisplayer.resetStats();
+				artifactStat.resetStat();
+				artifactStat.setArtifactPiece(null);
+				artifactDisplayerPanel.displayStat(); // update the stat
+				
+				JOptionPane.showMessageDialog(contentPane, "Stat is removed.");
+				
 				btnLock.setEnabled(true);
 				btnGenerate.setEnabled(true);
 				btnSkip.setEnabled(false);
 				btnRoll.setEnabled(false);
 				btnReroll.setEnabled(false);
 				btnReset.setEnabled(false);
-				JOptionPane.showMessageDialog(contentPane, "Stats are Removed!");
 				btnGenerate.requestFocus();
 				rollCounter = 0;
 				isNewSubStat = true;
@@ -195,21 +201,33 @@ public class ArtifactSimulator extends JFrame {
 		btnRoll.setBounds(111, 161, 90, 30);
 		btnRoll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				objArtifactDisplayer.setSkipMode(false);
+				String dialogTitle = "";
+				String dialogMessage = "";
+				
 				btnSkip.setEnabled(false);
 				
-				if(maxUpgrade == 4 && isNewSubStat) {
-					objArtifactDisplayer.upgradeSubStatValue();
+				if (maxUpgrade == 4 && isNewSubStat) {
+					artifactStat.upgradeSubStatValue();
 					isNewSubStat = false;
-				} else if(rollCounter < maxUpgrade) {
-					objArtifactDisplayer.upgradeSubStatValue();
+					
+					dialogTitle = "New Sub-Stat";
+					dialogMessage = artifactStat.getCurrentNewSubStat();
+				} else if (rollCounter < maxUpgrade) {
+					artifactStat.upgradeSubStatValue();
 					rollCounter++;
 					
-					if(rollCounter == maxUpgrade) {
+					if (rollCounter == maxUpgrade) {
 						btnRoll.setEnabled(false);
 						btnReroll.requestFocus();
 					}
+					
+					dialogTitle = "Sub-Stat Upgrade";
+					dialogMessage = artifactStat.getCurrentUpgradedSubStat();
 				}
+				
+				artifactDisplayerPanel.displayStat(); // update the stat
+				
+				JOptionPane.showMessageDialog(contentPane, dialogMessage, dialogTitle, JOptionPane.PLAIN_MESSAGE);
 				
 				btnReroll.setEnabled(true);
 			}
@@ -222,7 +240,9 @@ public class ArtifactSimulator extends JFrame {
 		btnReroll.setBounds(170, 120, 113, 30);
 		btnReroll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				objArtifactDisplayer.rerollStat();
+				artifactStat.rerollStat();
+				artifactDisplayerPanel.displayStat(); // update the stat
+				
 				btnSkip.setEnabled(true);
 				btnRoll.setEnabled(true);
 				btnReroll.setEnabled(false);
@@ -239,19 +259,22 @@ public class ArtifactSimulator extends JFrame {
 		btnCustomStat.setEnabled(false);
 		btnCustomStat.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(oneTime) {
+				if (oneTime) {
 					oneTime = false;
 					
 					InstructionDialog.showPaginationDialog(frameAncestor, "Artifact RNG - Custom Stat", displayCustomStatMessage());
 				}
 				
 				try {
-					CustomStatDialog customStat = new CustomStatDialog(frameAncestor, objArtifactDisplayer);
+					CustomStatDialog customStat = new CustomStatDialog(frameAncestor, artifactStat);
 					customStat.setVisible(true);
 					
-					if(CustomStatDialog.getIsCustomStatDisplayed()) {
-						maxUpgrade = objArtifactDisplayer.getMaxUpgrade();
+					if (CustomStatDialog.getIsCustomStatDisplayed()) {
+						maxUpgrade = artifactStat.getMaxUpgrade();
 						lblStatus.setText("Max Upgrade : " + maxUpgrade);
+						artifactDisplayerPanel.displayStat();
+						
+						JOptionPane.showMessageDialog(frameAncestor, "Stat is now displayed!");
 						
 						btnLock.setEnabled(false);
 						btnGenerate.setEnabled(false);
@@ -277,7 +300,7 @@ public class ArtifactSimulator extends JFrame {
 		lblStatus.setBounds(159, 202, 136, 30);
 		panelControls.add(lblStatus);
 		
-		cboArtifactPiece = new JComboBox<>(new DefaultComboBoxModel<>(new Artifact().getPiece()));
+		cboArtifactPiece = new JComboBox<>(new DefaultComboBoxModel<>(new Artifact().getArtifactPiece()));
 		cboArtifactPiece.setSelectedIndex(0);
 		cboArtifactPiece.setFont(new Font("Segoe UI", Font.BOLD, 12));
 		cboArtifactPiece.setBounds(10, 45, 169, 30);
@@ -310,13 +333,21 @@ public class ArtifactSimulator extends JFrame {
 		btnSkip = new JButton("Skip");
 		btnSkip.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String[] subStats = artifactStat.skipUpgradeSubStats();
+				artifactDisplayerPanel.displayStat(); // update the stat
+				
+				String template = "";
+				
+				for (int index = 0; index < subStats.length; index++) {
+					template += subStats[index] + "\n";
+				}
+				
+				JOptionPane.showMessageDialog(contentPane, template, "Final Sub-Stat", JOptionPane.PLAIN_MESSAGE);
+				
 				btnSkip.setEnabled(false);
 				btnRoll.setEnabled(false);
 				btnReroll.setEnabled(true);
 				btnReroll.requestFocus();
-				
-				objArtifactDisplayer.setSkipMode(true);
-				objArtifactDisplayer.displaySkippedStats();
 			}
 		});
 		btnSkip.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -348,34 +379,54 @@ public class ArtifactSimulator extends JFrame {
 		panelControls.add(chkFullUpgrade);
 	}
 	
-	private void lockComponent() {
-		if(isLock) {
-			btnCustomStat.setEnabled(true);
-			cboArtifactPiece.setEnabled(false);
-			
-			if (chkRandomStat.isSelected()) {
-				chkRandomStat.setEnabled(false);
-				chkFullUpgrade.setEnabled(false);
-			} else {
-				chkRandomStat.setEnabled(false);
-			}
-			
-			isLock = false;
-			btnLock.setText("Unlock");
-		} else {
-			btnCustomStat.setEnabled(false);
-			cboArtifactPiece.setEnabled(true);			
-			
-			if (chkRandomStat.isSelected()) {
-				chkRandomStat.setEnabled(true);
-				chkFullUpgrade.setEnabled(true);
-			} else {
-				chkRandomStat.setEnabled(true);
-			}
-			
-			isLock = true;
-			btnLock.setText("Lock");
-		}
+	private void handleRandomStatGeneration() {
+		artifactStat.setArtifactPiece(new Artifact().generateRandomPiece());
+		
+		generateStatAndUpdatePanel();
+
+	    if (chkFullUpgrade.isSelected()) {
+	        invokeSkipAction();
+	    } else {
+	    	showStatGeneratedMessage();
+	    }
+	}
+	
+	private void handleStatGeneration() {
+		artifactStat.setArtifactPiece((String) cboArtifactPiece.getSelectedItem());
+		generateStatAndUpdatePanel();
+	    showStatGeneratedMessage();
+	}
+	
+	private void generateStatAndUpdatePanel() {
+		artifactStat.generateStat();
+	    maxUpgrade = artifactStat.getMaxUpgrade();
+	    lblStatus.setText("Max Upgrade : " + maxUpgrade);
+	    artifactDisplayerPanel.displayStat(); // Update the stat
+	    updateButtonStates();
+	}
+	
+	private void updateButtonStates() {
+		cboArtifactPiece.setEnabled(false);
+	    btnGenerate.setEnabled(false);
+	    btnLock.setEnabled(false);
+	    btnSkip.setEnabled(true);
+	    btnRoll.setEnabled(true);
+	    btnReset.setEnabled(true);
+	    btnCustomStat.setEnabled(false);
+	    chkRandomStat.setEnabled(false);
+	    chkFullUpgrade.setEnabled(false);
+	}
+	
+	private void invokeSkipAction() {
+		// Invoke btnSkip click event
+	    ActionEvent event = new ActionEvent(btnSkip, ActionEvent.ACTION_PERFORMED, null);
+	    btnSkip.getActionListeners()[0].actionPerformed(event);
+	}
+	
+	private void showStatGeneratedMessage() {
+		JOptionPane.showMessageDialog(contentPane, "Stat is generated.");
+		
+	    btnRoll.requestFocus();
 	}
 	
 	private void setLookAndFeel() {
@@ -388,194 +439,201 @@ public class ArtifactSimulator extends JFrame {
 	}
 	
 	private String displayArtifactSimulatorMessage() {
+		
 		return """
-			<html>
-				<style>
-					.container {
-						font-family: 'Segoe UI';
-						overflow-wrap: break-word;
-					}
-					
-					.emphasis {
-						font-weight: bold;
-					}
-					
-					.text-center {
-						text-align: center;
-					}
-				</style>
-				<div class='container'>
-					<p class='text-center'>
-						This application is <span class='emphasis'>exclusive</span> only for 5 star artifact
-					</p> <br>
-					<p>
-						<span class='emphasis'>Max Upgrade</span>: Displays the number 
-						of upgrades an artifact can have.
-					</p>
-					<p>
-						<span class='emphasis'>Lock</span>: Locks the combo box and some buttons that
-						are not needed.
-					</p>
-					<p>
-						<span class='emphasis'>Generate</span>: Displays the artifact piece selected by the 
-						user and generates random main stat (for sands, goblet, circlet piece) and sub-stats.
-					</p>
-					<p>
-						<span class='emphasis'>Roll</span>: Upgrades a random value of a sub-stat.
-					</p>
-					<p>
-						<span class='emphasis'>Reroll</span>: Removes the upgrades of the sub-stats.
-					</p>
-					<p>
-						<span class='emphasis'>Reset</span>: Clears the main stat, sub-stats, and their values.
-					</p>
-					<p>
-						<span class='emphasis'>Custom Stat</span>: Allows you to enter your own stats.
-					</p> <br>
-					<p>
-						If the sub-stats are 3 only, it will have 
-						<span class='emphasis'>1 New Sub-Stat and 4 Upgrades</span>. 
-						If the sub-stats are 4, it will have 
-						<span class='emphasis'>5 Upgrades</span>.
-					</p> <br>
-					<p>
-						<p class='emphasis'>Flags</p>
-						<ul>
-							<li>
-								<span class='emphasis'>Random Stat</span>: Generate random artifact piece with random values.
-							</li>
-							<li>
-								<span class='emphasis'>Full Upgrade</span>: Upgrades the value to the max upgrade. 
-								(Need 'Random Stat' to be selected first)
-							</li>
-						</ul>
-					</p> <br>
-					<p>
-						These flags only works if the button is "Lock". Otherwise, it will not work if it's "Unlock".
-					</p> <br>
-					<p>
-						Occasionally, it may display incorrect decimals due to rounding errors.
-					</p> <br>
-					<p class='text-center'>
-						Click <span class='emphasis'>'OK'</span> to continue.
-					</p>
-				</div>
-			</html>
-		""";
+				<html>
+					<style>
+						.container {
+							font-family: 'Segoe UI';
+							overflow-wrap: break-word;
+						}
+						
+						.emphasis {
+							font-weight: bold;
+						}
+						
+						.text-center {
+							text-align: center;
+						}
+					</style>
+					<div class='container'>
+						<p class='text-center'>
+							This application is <span class='emphasis'>exclusive</span> only for 5 star artifact
+						</p> <br>
+						<p>
+							<span class='emphasis'>Max Upgrade</span>: Displays the number 
+							of upgrades an artifact can have.
+						</p>
+						<p>
+							<span class='emphasis'>Lock</span>: Locks the combo box and some buttons that
+							are not needed.
+						</p>
+						<p>
+							<span class='emphasis'>Generate</span>: Displays the artifact piece selected by the 
+							user and generates random main stat (for sands, goblet, circlet piece) and sub-stats.
+						</p>
+						<p>
+							<span class='emphasis'>Roll</span>: Upgrades a random value of a sub-stat.
+						</p>
+						<p>
+							<span class='emphasis'>Reroll</span>: Removes the upgrades of the sub-stats.
+						</p>
+						<p>
+							<span class='emphasis'>Reset</span>: Clears the main attribute, sub-stats, and their values.
+						</p>
+						<p>
+							<span class='emphasis'>Custom Stat</span>: Allows you to enter your own stat.
+						</p> <br>
+						<p>
+							If the sub-stats are 3 only, it will have 
+							<span class='emphasis'>1 New Sub-Stat and 4 Upgrades</span>. 
+							If the sub-stats are 4, it will have 
+							<span class='emphasis'>5 Upgrades</span>.
+						</p> <br>
+						<p>
+							<p class='emphasis'>Flags</p>
+							<ul>
+								<li>
+									<span class='emphasis'>Random Stat</span>: Generate random artifact piece stat.
+								</li>
+								<li>
+									<span class='emphasis'>Full Upgrade</span>: Upgrades the value to the max upgrade. 
+									(Need 'Random Stat' to be selected first)
+								</li>
+							</ul>
+						</p> <br>
+						<p>
+							These flags only works if the button is "Lock". Otherwise, it will not work if it's "Unlock".
+						</p> <br>
+						<p>
+							Occasionally, it may display incorrect decimals due to rounding errors.
+						</p> <br>
+						<p class='text-center'>
+							Click <span class='emphasis'>'OK'</span> to continue.
+						</p>
+					</div>
+				</html>
+			""";
 	}
 	
 	private String[] displayCustomStatMessage() {
 		String[] messages = new String[2];
 		
 		messages[0] = """
-			<html>
-				<style>
-					.container {
-						font-family: 'Segoe UI';
-						overflow-wrap: break-word;
-					}
-					
-					.emphasis {
-						font-weight: bold;
-					}
-					
-					.text-center {
-						text-align: center;
-					}
-				</style>
-				<div class='container'>
-					<p>
-						<span class='emphasis'>Select an artifact piece and main stat</span>. 
-						After selecting the main stat, the sub-stats will be displayed in the list.
-					</p> <br>
-					<p>
-						<span class='emphasis'>Adding a Sub-Stat</span>
-						<ul>
-							<li>Click the <span class='emphasis'>'Add Sub-Stat'</span> button.</li>
-							<li>
-								Select the slot where you want to add the sub-stat, then 
-								click <span class='emphasis'>'OK'</span>.
-							</li>
-						</ul>
-					</p>
-					<p>
-						<span class='emphasis'>Removing a Specific Sub-Stat</span>
-						<ul>
-							<li>Click the <span class='emphasis'>'Remove Sub-Stat'</span> button.</li>
-							<li>
-								Select the slot where you want to remove the sub-stat, then 
-								click <span class='emphasis'>'OK'</span>.
-							</li>
-						</ul>
-					</p>
-					<p>
-						<span class='emphasis'>Removing All Sub-Stats</span>
-						<ul>
-							<li>Click the <span class='emphasis'>'Remove All'</span> button.</li>
-						</ul>
-					</p>
-				</div>
-			</html>
-		""";
+					<html>
+						<style>
+							.container {
+								font-family: 'Segoe UI';
+								overflow-wrap: break-word;
+							}
+							
+							.emphasis {
+								font-weight: bold;
+							}
+							
+							.text-center {
+								text-align: center;
+							}
+						</style>
+						<div class='container'>
+							<p>
+								<span class='emphasis'>Select an artifact piece and main attribute</span>. 
+								After selecting the main attribute, the sub-stats will be displayed in the list.
+							</p> <br>
+							<p>
+								<span class='emphasis'>Adding Sub-Stat</span>
+								<ul>
+									<li>Click the <span class='emphasis'>'Add Sub-Stat'</span> button.</li>
+									<li>
+										Select the slot where you want to add the sub-stat, then 
+										click <span class='emphasis'>'OK'</span>.
+									</li>
+								</ul>
+							</p>
+							<p>
+								<span class='emphasis'>Removing Specific Sub-Stat</span>
+								<ul>
+									<li>Click the <span class='emphasis'>'Remove Sub-Stat'</span> button.</li>
+									<li>
+										Select the slot where you want to remove the sub-stat, then 
+										click <span class='emphasis'>'OK'</span>.
+									</li>
+								</ul>
+							</p>
+							<p>
+								<span class='emphasis'>Removing All Sub-Stats</span>
+								<ul>
+									<li>Click the <span class='emphasis'>'Remove All'</span> button.</li>
+								</ul>
+							</p>
+							<p>
+								<span class='emphasis'>Displaying Stat</span>
+								<ul>
+									<li>When you made up your mind, click <span class='emphasis'>'Finalize Stat'</span> to display the stat.</li>
+								</ul>
+							</p>
+						</div>
+					</html>
+				""";
 		
 		messages[1] = """
-			<html>
-				<style>
-					.container {
-						font-family: 'Segoe UI';
-						overflow-wrap: break-word;
-					}
-					
-					.emphasis {
-						font-weight: bold;
-					}
-					
-					.text-center {
-						text-align: center;
-					}
-				</style>
-				<div class='container'>
-					<p>
-						You can place <span class='emphasis'>first 2 sub-stats and first 3 or 4 sub-stats</span>.
-					</p> <br>
-					<p>
-						If you only placed first 2 sub-stats, the rest will automatically generated whether you
-						will have 3 sub-stats or 4 sub-stats.
-					</p> <br>
-					<p>
-						<span class='emphasis'>Can display stats if</span>
-						<ul>
-							<li>Slot 1 and Slot 2 are filled</li>
-							<li>Slot 1 to 3 are filled or Slot 1 to 4 are filled</li>
-						</ul>
-					</p>
-					<p>
-						<span class='emphasis'>Cannot display stats if</span>
-						<ul>
-							<li>All Slots are empty</li>
-							<li>Slot 1 and Slot 2 are empty but Slot 3 and Slot 4 are filled</li>
-						</ul>
-					</p> <br>
-					<p>
-						<span class='emphasis'>Defined Affix Mode</span>
-						<p>
-							This mode works like the current verion of Genshin's v5.0. You will have to 
-							choose <span class='emphasis'>artifact piece (sands, goblet, circlet piece)</span>, 
-							<span class='emphasis'>main stat</span>, and <span class='emphasis'>2 sub-stats</span>. 
-							The rest will automatically generate.
-						</p>
-						<p>The catch is that you can't choose initial value, it will be automically generated as well.</p>
-					</p> <br>
-					<p>
-						<span class='emphasis'>TIP</span>: To quickly add a sub-stat, select it 
-						and press "ENTER" instead of clicking the button.
-					</p> <br>
-					<p class='text-center'>
-						Click <span class='emphasis'>'OK'</span> to continue.
-					</p>
-				</div>
-			</html>
-		""";
+					<html>
+						<style>
+							.container {
+								font-family: 'Segoe UI';
+								overflow-wrap: break-word;
+							}
+							
+							.emphasis {
+								font-weight: bold;
+							}
+							
+							.text-center {
+								text-align: center;
+							}
+						</style>
+						<div class='container'>
+							<p>
+								You can place <span class='emphasis'>first 2 sub-stats and first 3 or 4 sub-stats</span>.
+							</p> <br>
+							<p>
+								If you only placed first 2 sub-stats, the rest will automatically generated whether you
+								will have 3 sub-stats or 4 sub-stats.
+							</p> <br>
+							<p>
+								<span class='emphasis'>Can display stat if</span>
+								<ul>
+									<li>Slot 1 and Slot 2 are filled</li>
+									<li>Slot 1 to 3 are filled or Slot 1 to 4 are filled</li>
+								</ul>
+							</p>
+							<p>
+								<span class='emphasis'>Cannot display stat if</span>
+								<ul>
+									<li>All Slots are empty</li>
+									<li>Slot 1 and Slot 2 are empty but Slot 3 and Slot 4 are filled</li>
+								</ul>
+							</p> <br>
+							<p>
+								<span class='emphasis'>Defined Affix Mode</span>
+								<p>
+									This mode works like the current verion of Genshin's v5.0. You will have to 
+									choose <span class='emphasis'>artifact piece (sands, goblet, circlet piece)</span>, 
+									<span class='emphasis'>main attribute</span>, and <span class='emphasis'>2 sub-stats</span>. 
+									The rest will automatically generate.
+								</p>
+								<p>The catch is that you can't choose initial value, it will be automically generated as well.</p>
+							</p> <br>
+							<p>
+								<span class='emphasis'>TIP</span>: To quickly add a sub-stat, select it 
+								and press "ENTER" instead of clicking the button.
+							</p> <br>
+							<p class='text-center'>
+								Click <span class='emphasis'>'OK'</span> to continue.
+							</p>
+						</div>
+					</html>
+				""";
 		
 		return messages;
 	}

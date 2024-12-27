@@ -1,20 +1,20 @@
 import java.util.Objects;
 
-public sealed class AttributeStat permits ProbabilityStat, ValueStat, WeightedStat {
-	private final String attribute;
+public sealed abstract class AttributeStat permits AttributeProbabilityStat, AttributeValueStat, AttributeWeightStat {
+	private final String attributeName;
     
-    public AttributeStat(String attribute) {
-    	this.attribute = attribute;
+    public AttributeStat(String attributeName) {
+    	this.attributeName = attributeName;
     }
     
-    public String getAttribute() {
-        return attribute;
+    public String getAttributeName() {
+        return attributeName;
     }
     
     @Override
     public String toString() {
         return "AttributeStat{" +
-                "attribute='" + attribute + '\'' +
+                "attributeName='" + attributeName + '\'' +
                 '}';
     }
 
@@ -23,11 +23,11 @@ public sealed class AttributeStat permits ProbabilityStat, ValueStat, WeightedSt
         if (this == o) return true; 								// Check if both references point to the same object
         if (!(o instanceof AttributeStat)) return false; 			// Check if the object is of the same type
         AttributeStat attributeStat = (AttributeStat) o; 			// Cast the object to BaseStat
-        return Objects.equals(attribute, attributeStat.attribute); 	// Compare attributes for equality
+        return attributeName.equals(attributeStat.attributeName);	// Compare attributeNames for equality
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(attribute); // Generate a hash code based on the attribute
+        return Objects.hash(attributeName); // Generate a hash code based on the attributeName
     }
 }

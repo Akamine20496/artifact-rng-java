@@ -15,7 +15,12 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 
 public class InstructionDialog extends JDialog {
-    private CardLayout cardLayout;
+    /**
+	 * Serial Version UID
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private CardLayout cardLayout;
     private JPanel cardPanel;
     private JButton btnNext;
     private JButton btnBack;
@@ -33,7 +38,7 @@ public class InstructionDialog extends JDialog {
         setMinimumSize(new Dimension(400, 300)); // Set minimum size
         setLocationRelativeTo(owner);
         setIconImage(Toolkit.getDefaultToolkit().getImage(InstructionDialog.class.getResource("/assets/Amber Icon.jpg")));
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         
         initializeUI(messages);
     }
@@ -143,12 +148,12 @@ public class InstructionDialog extends JDialog {
         return panel;
     }
 
-    public static void showPaginationDialog(Frame owner, String title, String... panels) {
-    	InstructionDialog dialog = new InstructionDialog(owner, title, panels);
+    public static void showPaginationDialog(Frame owner, String title, String... messages) {
+    	InstructionDialog dialog = new InstructionDialog(owner, title, messages);
         dialog.setVisible(true);
     }
 
-    public static void showMessageDialog(Frame owner, String title, String panel) {
-        showPaginationDialog(owner, title, panel);
+    public static void showMessageDialog(Frame owner, String title, String message) {
+        showPaginationDialog(owner, title, message);
     }
 }
