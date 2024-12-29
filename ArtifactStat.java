@@ -47,11 +47,11 @@ public final class ArtifactStat {
 	}
 
 	public void setMaxUpgrade(int maxUpgrade) throws IllegalArgumentException {
-		if (maxUpgrade != 4 || maxUpgrade != 5) {
+		if (maxUpgrade == 4 || maxUpgrade == 5) {
+			this.maxUpgrade = maxUpgrade;
+		} else {
 			throw new IllegalArgumentException("Max Upgrade is either 4 or 5");
 		}
-		
-		this.maxUpgrade = maxUpgrade;
 	}
 
 	public String getArtifactPiece() {
@@ -104,7 +104,7 @@ public final class ArtifactStat {
 	
 	private void generateFourthSubStat() throws NullPointerException {
 		if (mainAttribute == null && maxUpgrade == 0) {
-			throw new NullPointerException("mainAttribute is null and maxUpgrade is null");
+			throw new NullPointerException("mainAttribute is null and maxUpgrade is 0");
 		}
 		
 		artifactSubStats[3] = artifact.generateSubStat(mainAttribute, 
@@ -244,10 +244,10 @@ public final class ArtifactStat {
 			upgradeSubStatValue();
 		}
 
-		s1 = artifact.formatSubStat(2, artifactSubStats[0]);
-		s2 = artifact.formatSubStat(2, artifactSubStats[1]);
-		s3 = artifact.formatSubStat(2, artifactSubStats[2]);
-		s4 = maxUpgrade == 4 ? artifact.formatSubStat(0, artifactSubStats[3]) : artifact.formatSubStat(2, artifactSubStats[3]);
+		s1 = artifact.formatSubStat(3, artifactSubStats[0]);
+		s2 = artifact.formatSubStat(3, artifactSubStats[1]);
+		s3 = artifact.formatSubStat(3, artifactSubStats[2]);
+		s4 = maxUpgrade == 4 ? artifact.formatSubStat(0, artifactSubStats[3]) : artifact.formatSubStat(3, artifactSubStats[3]);
 		
 		return new String[] { s1, s2, s3, s4 };
 	}
@@ -329,7 +329,7 @@ public final class ArtifactStat {
 	 */
 	public ArtifactSubStat getSubStatAt(int index) throws IndexOutOfBoundsException {
 		if (index < 0 || index >= artifactSubStats.length) {
-			throw new IndexOutOfBoundsException();
+			throw new IndexOutOfBoundsException("Index out of bounds: " + index);
 		}
 		
 		return artifactSubStats[index];

@@ -274,7 +274,7 @@ public class ArtifactSimulator extends JFrame {
 						lblStatus.setText("Max Upgrade : " + maxUpgrade);
 						artifactDisplayerPanel.displayStat();
 						
-						JOptionPane.showMessageDialog(frameAncestor, "Stat is now displayed!");
+						JOptionPane.showMessageDialog(frameAncestor, "Custom Stat is now displayed!");
 						
 						btnLock.setEnabled(false);
 						btnGenerate.setEnabled(false);
@@ -342,7 +342,7 @@ public class ArtifactSimulator extends JFrame {
 					template += subStats[index] + "\n";
 				}
 				
-				JOptionPane.showMessageDialog(contentPane, template, "Final Sub-Stat", JOptionPane.PLAIN_MESSAGE);
+				JOptionPane.showMessageDialog(contentPane, template, "Final Sub-Stats", JOptionPane.PLAIN_MESSAGE);
 				
 				btnSkip.setEnabled(false);
 				btnRoll.setEnabled(false);
@@ -470,7 +470,7 @@ public class ArtifactSimulator extends JFrame {
 						</p>
 						<p>
 							<span class='emphasis'>Generate</span>: Displays the artifact piece selected by the 
-							user and generates random main stat (for sands, goblet, circlet piece) and sub-stats.
+							user and generates random main attribute (for sands, goblet, circlet piece) and sub-stats.
 						</p>
 						<p>
 							<span class='emphasis'>Roll</span>: Upgrades a random value of a sub-stat.
@@ -617,7 +617,7 @@ public class ArtifactSimulator extends JFrame {
 							<p>
 								<span class='emphasis'>Defined Affix Mode</span>
 								<p>
-									This mode works like the current verion of Genshin's v5.0. You will have to 
+									This mode works like new gadget "Artifact Transmuter". You will have to 
 									choose <span class='emphasis'>artifact piece (sands, goblet, circlet piece)</span>, 
 									<span class='emphasis'>main attribute</span>, and <span class='emphasis'>2 sub-stats</span>. 
 									The rest will automatically generate.

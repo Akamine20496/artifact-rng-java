@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 public final class Attribute {
-	private static final Attribute INSTANCE = new Attribute();
+	private static Attribute instance;
 	
 	private static final double[] HP_FLAT_VALUE = { 209.13, 239.00, 268.88, 298.75 };
 	private static final double[] ATK_FLAT_VALUE = { 13.62, 15.56, 17.51, 19.45 };
@@ -73,7 +73,15 @@ public final class Attribute {
 	private Attribute() {}
 	
 	public static Attribute getInstance() {
-		return INSTANCE;
+		if (instance == null) {
+			synchronized (Attribute.class) {
+				if (instance == null) {
+					instance = new Attribute();
+				}
+			}
+		}
+		
+		return instance;
 	}
 	
 	public double[] getAttributeValues(String attributeName) throws NullPointerException, IllegalArgumentException {

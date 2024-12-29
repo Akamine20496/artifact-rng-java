@@ -133,7 +133,7 @@ public class CustomStatDialog extends JDialog {
 					int response = JOptionPane.showConfirmDialog(contentPane, "Finalize the stat?", "Select an option", JOptionPane.YES_NO_OPTION);
 					
 					if (response == JOptionPane.YES_OPTION) {
-                    	displayCustomStats();
+                    	displayCustomStat();
                         isCustomStatDisplayed = true;
                 		dispose();
 					}
@@ -378,16 +378,16 @@ public class CustomStatDialog extends JDialog {
 								} else {
 									switch (result) {
 										case "1" -> {
-											addStat(lblAttr1, attribute, cboAttrValue1);
+											addSubStat(lblAttr1, attribute, cboAttrValue1);
 											isAdded = true;											
 										}
 										case "2" -> {											
-											addStat(lblAttr2, attribute, cboAttrValue2);
+											addSubStat(lblAttr2, attribute, cboAttrValue2);
 											isAdded = true;
 										}
 										case "3" -> {											
 											if (!definedAffixMode) {
-												addStat(lblAttr3, attribute, cboAttrValue3);
+												addSubStat(lblAttr3, attribute, cboAttrValue3);
 												isAdded = true;
 											} else {
 												JOptionPane.showMessageDialog(contentPane, "Enter a number only 1 and 2!");
@@ -395,7 +395,7 @@ public class CustomStatDialog extends JDialog {
 										}
 										case "4" -> {											
 											if (!definedAffixMode) {
-												addStat(lblAttr4, attribute, cboAttrValue4);
+												addSubStat(lblAttr4, attribute, cboAttrValue4);
 												isAdded = true;
 											} else {
 												JOptionPane.showMessageDialog(contentPane, "Enter a number only 1 and 2!");
@@ -468,16 +468,16 @@ public class CustomStatDialog extends JDialog {
 							} else {
 								switch (result) {
 									case "1" -> {
-										removeStat(lblAttr1, cboAttrValue1);
+										removeSubStat(lblAttr1, cboAttrValue1);
 										isRemoved = true;
 									}
 									case "2" -> {
-										removeStat(lblAttr2, cboAttrValue2);
+										removeSubStat(lblAttr2, cboAttrValue2);
 										isRemoved = true;
 									}
 									case "3" -> {
 										if (!definedAffixMode) {
-											removeStat(lblAttr3, cboAttrValue3);
+											removeSubStat(lblAttr3, cboAttrValue3);
 											isRemoved = true;
 										} else {
 											JOptionPane.showMessageDialog(contentPane, "Enter a number only 1 or 2!");
@@ -485,7 +485,7 @@ public class CustomStatDialog extends JDialog {
 									}
 									case "4" -> {
 										if (!definedAffixMode) {
-											removeStat(lblAttr4, cboAttrValue4);
+											removeSubStat(lblAttr4, cboAttrValue4);
 											isRemoved = true;
 										} else {
 											JOptionPane.showMessageDialog(contentPane, "Enter a number only 1 or 2!");
@@ -513,7 +513,7 @@ public class CustomStatDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				if (isNone(lblAttr1.getText()) && isNone(lblAttr2.getText()) 
 						&& isNone(lblAttr3.getText()) && isNone(lblAttr4.getText())) {
-					JOptionPane.showMessageDialog(contentPane, "There are no sub-stats!");
+					JOptionPane.showMessageDialog(contentPane, "There are no sub-stat/s!");
 				} else {
 					int response = JOptionPane.showConfirmDialog(contentPane, 
 							"Remove all sub-stats?", "Select an option", JOptionPane.YES_NO_OPTION);
@@ -542,7 +542,17 @@ public class CustomStatDialog extends JDialog {
 		panelSetup.add(btnRemoveAll);
 	}
 	
-	private void removeStat(JLabel lblAttr, JComboBox<Double> cboAttrValue) {
+	private void addSubStat(JLabel lblAttr, String selectedAttribute, JComboBox<Double> cboAttrValue) {
+		lblAttr.setText(selectedAttribute);
+		
+		if (!definedAffixMode) {
+			setValue(lblAttr, cboAttrValue);
+		}
+		
+		JOptionPane.showMessageDialog(contentPane, selectedAttribute + " is added!");
+	}
+	
+	private void removeSubStat(JLabel lblAttr, JComboBox<Double> cboAttrValue) {
 		String temp = null;
 		
 		if (isNone(lblAttr.getText())) {
@@ -557,16 +567,6 @@ public class CustomStatDialog extends JDialog {
 		if (!temp.equals("None")) {
 			JOptionPane.showMessageDialog(contentPane, temp + " is removed!");
 		}
-	}
-	
-	private void addStat(JLabel lblAttr, String selectedAttribute, JComboBox<Double> cboAttrValue) {
-		lblAttr.setText(selectedAttribute);
-		
-		if (!definedAffixMode) {
-			setValue(lblAttr, cboAttrValue);
-		}
-		
-		JOptionPane.showMessageDialog(contentPane, selectedAttribute + " is added!");
 	}
 	
 	private void setValue(JLabel lblAttr, JComboBox<Double> cboAttrValue) throws IllegalArgumentException {
@@ -598,7 +598,7 @@ public class CustomStatDialog extends JDialog {
 		});
 	}
 	
-	public void displayCustomStats() {
+	public void displayCustomStat() {
 		String artifactPiece = (String) cboArtifactPiece.getSelectedItem();
         String mainAttribute = (String) cboMainStat.getSelectedItem();
 

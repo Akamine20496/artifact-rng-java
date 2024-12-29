@@ -105,7 +105,7 @@ public final class Artifact {
 			new AttributeProbabilityStat(Attribute.ELEMENTAL_MASTERY, 4.00)
 	);
 	
-	private final List<AttributeWeightStat> LIST_WEIGHTED_STATS = Arrays.asList(
+	private final List<AttributeWeightStat> LIST_WEIGHT_STATS = Arrays.asList(
 			new AttributeWeightStat(Attribute.HP_FLAT, 6),
 			new AttributeWeightStat(Attribute.ATK_FLAT, 6),
 			new AttributeWeightStat(Attribute.DEF_FLAT, 6),
@@ -143,10 +143,6 @@ public final class Artifact {
 	
 	public String[] getCircletPiece() {
 		return CIRCLET_OF_LOGOS;
-	}
-	
-	public String[] getMainAttributeNames() {
-		return MAIN_ATTRIBUTE_NAMES;
 	}
 	
 	// RESPONSIBLE FOR GENERATING SPECIFIC PARTS
@@ -295,47 +291,47 @@ public final class Artifact {
 	private List<AttributeProbabilityStat> getStatProbabilityList(List<String> listAttributeNames) {
 		List<AttributeProbabilityStat> selectedStats = new ArrayList<>();
 		
-		for (AttributeWeightStat currentWeightedStat : LIST_WEIGHTED_STATS) {
-			if (!listAttributeNames.contains(currentWeightedStat.getAttributeName())) {
-				AttributeProbabilityStat probabilityStat = calculateStatProbability(currentWeightedStat, listAttributeNames);
-				selectedStats.add(probabilityStat);
+		for (AttributeWeightStat currentWeightStat : LIST_WEIGHT_STATS) {
+			if (!listAttributeNames.contains(currentWeightStat.getAttributeName())) {
+				AttributeProbabilityStat attributeProbabilityStat = calculateStatProbability(currentWeightStat, listAttributeNames);
+				selectedStats.add(attributeProbabilityStat);
 			}
 		}
 		
 		return selectedStats;
 	}
 	
-	private AttributeProbabilityStat calculateStatProbability(AttributeWeightStat targetWeightedStat, List<String> listAttributeNames) throws NullPointerException, IllegalArgumentException {
+	private AttributeProbabilityStat calculateStatProbability(AttributeWeightStat targetWeightStat, List<String> listAttributeNames) throws NullPointerException, IllegalArgumentException {
 		boolean isFound = false;
         int totalWeight = 0;
 		
 		// verify the targetWeightedStat and existingStats
-		if (targetWeightedStat == null || listAttributeNames == null) {
+		if (targetWeightStat == null || listAttributeNames == null) {
         	throw new NullPointerException("Requires non-null object");
         }
         
         // verify the targetWeightedStat
         for (String attributeName : Attribute.ATTRIBUTE_NAMES) {
-        	if (attributeName.equals(targetWeightedStat.getAttributeName())) {
+        	if (attributeName.equals(targetWeightStat.getAttributeName())) {
         		isFound = true;
         		break;
         	}
         }
         
         if (!isFound) {
-        	throw new IllegalArgumentException("Invalid attributeName: " + targetWeightedStat.getAttributeName());
+        	throw new IllegalArgumentException("Invalid attributeName: " + targetWeightStat.getAttributeName());
         }
         
         // Calculate the total weight of available sub-stats (excluding the ones already existing)
-        for (AttributeWeightStat currentWeightedStat : LIST_WEIGHTED_STATS) {
-        	if (!listAttributeNames.contains(currentWeightedStat.getAttributeName())) {
-        		totalWeight += currentWeightedStat.getAttributeWeight();
+        for (AttributeWeightStat currentWeightStat : LIST_WEIGHT_STATS) {
+        	if (!listAttributeNames.contains(currentWeightStat.getAttributeName())) {
+        		totalWeight += currentWeightStat.getAttributeWeight();
         	}
         }
         
-        double probability = (double) targetWeightedStat.getAttributeWeight() / totalWeight * 100;
+        double probability = (double) targetWeightStat.getAttributeWeight() / totalWeight * 100;
         
-        return new AttributeProbabilityStat(targetWeightedStat.getAttributeName(), probability);
+        return new AttributeProbabilityStat(targetWeightStat.getAttributeName(), probability);
     }
 	
 	// RESPONSIBLE FOR CHECKING GENUINE ARTIFACT NAMES
@@ -345,7 +341,7 @@ public final class Artifact {
 			throw new NullPointerException("attributeName must not be null");
 		}
 		
-		return attributeName.contains("%");
+		return attributeName.endsWith("%");
 	}
 	
 	public String isArtifactPiece(String artifactPieceName) throws NullPointerException, IllegalArgumentException {
@@ -457,8 +453,8 @@ public final class Artifact {
 	
 	/**
 	 * Formats Sub-Stat
-	 * @param mode 0 = new, 1 = displaying, 2 = upgrade 
-	 * @param artifactSubStat ArtifactSubStat class
+	 * @param mode 0 = new, 1 = displaying, 2 = upgrade, 3 = skip upgrade
+	 * @param artifactSubStat {@link ArtifactSubStat} class
 	 * @return depending on the mode chosen
 	 * @throws NullPointerException
 	 */
@@ -473,6 +469,8 @@ public final class Artifact {
 			case 1 -> 
 				formatSubStat(artifactSubStat.getAttributeName(), artifactSubStat.getAttributeValue());
 			case 2 -> 
+				formatSubStat(artifactSubStat.getAttributeName(), artifactSubStat.getPrevAttributeValue(), artifactSubStat.getAttributeValue());
+			case 3 -> 
 				formatSubStat(artifactSubStat.getAttributeName(), artifactSubStat.getInitialAttributeValue(), artifactSubStat.getAttributeValue());
 			default -> 
 				throw new IllegalArgumentException("Invalid mode: " + mode);
@@ -531,10 +529,10 @@ public final class Artifact {
 			return String.format("%-25s ----- %.1f%%", formatSubStat(attributeName), attributeValue);
 		}
 		
-		return String.format("%-25s ----- %d", formatSubStat(attributeName), Math.round(attributeValue));
+		return String.format("%-25s ----- %d", attributeName, Math.round(attributeValue));
 	}
 	
-	public String formatSubStatValue(String attributeName, double attributeValue) throws NullPointerException {
+	public String formatSubAttributeValue(String attributeName, double attributeValue) throws NullPointerException {
 		if (attributeName == null) {
 			throw new NullPointerException("attributeName must not be null");
 		}
