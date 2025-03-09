@@ -25,6 +25,7 @@ You can make this application kind of guess your artifact rolls or just generate
 - Thanks to the Genshin Wiki and KeqingMains (this is a website) for the datas used for the application.
   [Genshin Wiki](https://genshin-impact.fandom.com/wiki/Artifact/Distribution)
   [KeqingMains](https://keqingmains.com/misc/artifacts/#Substats)
+  [Artifact Category Distribution](https://genshin-impact.fandom.com/wiki/Loot_System/Artifact_Drop_Distribution)
 
 ## Disclaimer
 - This Desktop Application is not affiliated with HoYoVerse or miHoYo.
