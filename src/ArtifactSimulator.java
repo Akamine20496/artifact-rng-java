@@ -623,6 +623,10 @@ public class ArtifactSimulator extends JFrame {
 									The rest will automatically generate.
 								</p>
 								<p>The catch is that you can't choose initial value, it will be automically generated as well.</p>
+								<p>
+									Additionally, the sub-stats chosen will have at least <span class='emphasis'>2</span> rolls
+									when fully upgraded. These sub-stats will share this guaranteed roll.
+								</p>
 							</p> <br>
 							<p>
 								<span class='emphasis'>TIP</span>: To quickly add a sub-stat, select it 

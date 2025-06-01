@@ -1,17 +1,3 @@
-/Artifact.class
-/ArtifactDisplayerPanel.class
-/ArtifactSimulator$1.class
-/ArtifactSimulator$2.class
-/ArtifactSimulator$3.class
-/ArtifactSimulator$4.class
-/ArtifactSimulator$5.class
-/ArtifactSimulator$6.class
-/ArtifactSimulator$7.class
-/ArtifactSimulator$8.class
-/ArtifactSimulator$9.class
-/ArtifactSimulator.class
-/ArtifactStat.class
-/ArtifactSubStat.class
 /Attribute.class
 /AttributeProbabilityStat.class
 /AttributeStat.class
@@ -28,4 +14,6 @@
 /CustomStatDialog$9.class
 /CustomStatDialog.class
 /InstructionDialog.class
-/assets/
+/ArtifactDisplayerPanel$1.class
+/ArtifactDisplayerPanel$2.class
+/ArtifactStat$SlotChoice.class

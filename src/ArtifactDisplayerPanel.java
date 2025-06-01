@@ -1,8 +1,18 @@
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JWindow;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 
@@ -17,6 +27,9 @@ public class ArtifactDisplayerPanel extends JPanel {
 	private JLabel lblArtifactPiece;
 	private JLabel lblMainAttribute;
 	private JLabel lblSlot1, lblSlot2, lblSlot3, lblSlot4;
+	
+	private JWindow hoverPopup;
+	private JLabel popupLabel;
 
 	/**
 	 * Create the panel.
@@ -73,6 +86,9 @@ public class ArtifactDisplayerPanel extends JPanel {
 		lblArtifactPiece.setBackground(Color.BLACK);
 		lblArtifactPiece.setBounds(10, 11, 211, 29);
 		upperPanel.add(lblArtifactPiece);
+		
+		initHoverPopup();
+		addHoverListeners();
 	}
 
 	public void displayStat() {
@@ -97,5 +113,99 @@ public class ArtifactDisplayerPanel extends JPanel {
 
 	private String displaySubStat(String subStat) {
 		return String.format("· %s", subStat);
+	}
+
+	private void initHoverPopup() {
+		hoverPopup = new JWindow();
+		
+		popupLabel = new JLabel("", JLabel.CENTER);
+		popupLabel.setOpaque(true);
+		popupLabel.setBackground(new Color(255, 255, 225));
+		// Add padding around the text inside the label
+		popupLabel.setBorder(new CompoundBorder(new LineBorder(Color.BLACK), new EmptyBorder(5, 8, 5, 8)));
+		popupLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
+		popupLabel.setHorizontalAlignment(JLabel.LEFT);
+	    popupLabel.setVerticalAlignment(JLabel.TOP);
+		
+		hoverPopup.getContentPane().add(popupLabel);
+	}
+
+	private void addHoverListeners() {
+		// Add a listener to handle mouse movement over the panel
+		addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				// Only show popup if definedAffixMode is true
+	            if (!artifactStat.getDefinedAffixMode()) {
+	                hoverPopup.setVisible(false);
+	                
+	                return; // exit early, no popup
+	            }
+				
+				// Update the popup text dynamically
+				popupLabel.setText(getPopupText());
+				
+				// Let label resize itself according to the content
+	            popupLabel.setSize(popupLabel.getPreferredSize());
+
+	            // Let Swing size it automatically based on preferred size + borders
+	            hoverPopup.pack();
+
+				// Get the current cursor position on screen
+				Point screenPoint = e.getLocationOnScreen();
+				Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+				
+				int popupWidth = hoverPopup.getWidth();
+				int popupHeight = hoverPopup.getHeight();
+				
+				// Increase the offset from the cursor so popup won't overlap the pointer
+			    int offsetX = 30;
+			    int offsetY = 30;
+
+				// Default tooltip offset near the cursor
+				int x = screenPoint.x + offsetX;
+				int y = screenPoint.y + offsetY;
+
+				// Adjust if tooltip would go off the right edge of the screen
+				if (x + popupWidth > screenSize.width) {
+					x = screenPoint.x - popupWidth - offsetX;
+				}
+				
+				// Adjust if tooltip would go off the bottom edge of the screen
+				if (y + popupHeight > screenSize.height) {
+					y = screenPoint.y - popupHeight - offsetY;
+				}
+
+				// Reposition and show the tooltip
+				hoverPopup.setLocation(x, y);
+				hoverPopup.setVisible(true);
+			}
+		});
+
+		// Hide the tooltip when the mouse leaves the panel
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseExited(MouseEvent e) {
+				hoverPopup.setVisible(false);
+			}
+		});
+	}
+
+	private String getPopupText() {
+		StringBuilder sb = new StringBuilder("<html>");
+		
+		sb.append("<b>Defined Affix Mode</b><br>");
+		sb.append("These sub-stats will share a guaranteed at least <b>2</b> rolls when fully upgraded.<br><br>");
+		sb.append("Chosen sub-stats:<br>");
+		
+		Map<String, Integer> subStatAffixCounter = artifactStat.getSubStatUpgradeCounts();
+		
+		for (Map.Entry<String, Integer> entry : subStatAffixCounter.entrySet()) {
+			sb.append(String.format("· %s (%d)<br>", entry.getKey(), entry.getValue()));
+		}
+		
+		sb.append("</html>");
+		
+		return sb.toString();
 	}
 }

@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 public final class ArtifactStat {
 	private Artifact artifact = new Artifact();
 	
@@ -13,6 +16,13 @@ public final class ArtifactStat {
 	
 	private String currentNewSubStat;
 	private String currentUpgradedSubStat;
+	
+	private boolean definedAffixMode = false;
+	private boolean isGuaranteedRoll = false;
+	
+	private int guaranteedRollLimit = 2;
+	
+	private Map<String, Integer> subStatUpgradeCounts = new HashMap<>();
 	
 	public ArtifactStat() {
 		artifactPiece = artifact.generateRandomPiece();
@@ -78,6 +88,14 @@ public final class ArtifactStat {
 		return artifactSubStats.length;
 	}
 	
+	public boolean getDefinedAffixMode() {
+		return definedAffixMode;
+	}
+	
+	public Map<String, Integer> getSubStatUpgradeCounts() {
+        return new HashMap<>(subStatUpgradeCounts);
+    }
+	
 	/**
 	 * Generates random Main Attribute, Max Upgrade, and Sub-Stats. <br> <br>
 	 * 
@@ -127,6 +145,8 @@ public final class ArtifactStat {
 			throw new NullPointerException("mainAttribute is null");
 		}
 		
+		definedAffixMode = true;
+		
 		maxUpgrade = artifact.generateMaxUpgrade();
 		
 		if (artifactSubStats[0].getIsInitialValueEmpty() && artifactSubStats[1].getIsInitialValueEmpty()) {
@@ -140,6 +160,9 @@ public final class ArtifactStat {
 										artifactSubStats[0].getAttributeName(), 
 										artifactSubStats[1].getAttributeName(), 
 										artifactSubStats[2].getAttributeName());
+		
+		subStatUpgradeCounts.put(artifactSubStats[0].getAttributeName(), 0);
+		subStatUpgradeCounts.put(artifactSubStats[1].getAttributeName(), 0);
 	}
 	
 	public void rerollStat() {
@@ -149,6 +172,11 @@ public final class ArtifactStat {
 		upgradeCounter = 0;
 		totalUpgrade = 0;
 		isMax = false;
+		
+		if (definedAffixMode) {
+			subStatUpgradeCounts.put(artifactSubStats[0].getAttributeName(), 0);
+			subStatUpgradeCounts.put(artifactSubStats[1].getAttributeName(), 0);
+		}
 	}
 	
 	public void resetStat() {
@@ -161,6 +189,10 @@ public final class ArtifactStat {
 		maxUpgrade = 0;
 		totalUpgrade = 0;
 		isMax = false;
+		
+		definedAffixMode = false;
+		
+		subStatUpgradeCounts.clear();
 	}
 	
 	public void upgradeSubStatValue() throws NullPointerException {
@@ -174,8 +206,35 @@ public final class ArtifactStat {
 			if (!isMax) { 													// if the total upgrades of 5 or 4 is reached
 				if (upgradeCounter == 0) { 									// if the counter is 0, it will loop
 					while (upgradeCounter == 0) { 							// until the upgrade counter is not 0
-						slotNumber = artifact.generateRandomSlot();
+						// add all count from map
+						int totalAffixModeRoll = subStatUpgradeCounts.values().stream().mapToInt(Integer::intValue).sum();
+						
+						int guaranteedLeft = guaranteedRollLimit - totalAffixModeRoll;
+
+                        // How many +1's remain BEFORE this mini‐batch?
+                        // (Since upgradeCounter == 0, "applied so far" = totalUpgrade)
+                        int remainingUpgrades = maxUpgrade - totalUpgrade;
+						
+                        // If we still owe some guaranteed rolls, AND there are exactly that many +1's left, force now:
+                        if (definedAffixMode && guaranteedLeft > 0 && remainingUpgrades == guaranteedLeft) {
+                            slotNumber = artifact.generateRandomSlot(definedAffixMode); // force 1 or 2
+                            isGuaranteedRoll = true;
+                        } else {
+                            // Normal 50% chance for affix vs all‐slots:
+                            double randomChance = artifact.generateNumber();
+                            
+                            if (definedAffixMode && totalAffixModeRoll != guaranteedRollLimit && randomChance <= 50.00) {
+                                slotNumber = artifact.generateRandomSlot(definedAffixMode);
+                                isGuaranteedRoll = true;
+                            } else {
+                                slotNumber = artifact.generateRandomSlot();
+                            }
+                        }
+						
 						upgradeCounter = artifact.generateUpgradeTimes();
+						
+						if (upgradeCounter == 0) continue;					// If upgradeCounter is 0, reiterate
+						
 						totalUpgrade += upgradeCounter;
 					}
 
@@ -203,14 +262,39 @@ public final class ArtifactStat {
 			throw new NullPointerException("mainAttribute is null");
 		}
 		
+		// Compute how many +1's were applied BEFORE this call
+        int totalAppliedBefore = totalUpgrade - upgradeCounter;
+        // How many +1's remain (including this one)?
+        int remainingUpgrades  = maxUpgrade - totalAppliedBefore;
+        // How many guaranteed‐affix rolls have been used so far?
+        int totalAffixModeRoll = subStatUpgradeCounts.values().stream().mapToInt(Integer::intValue).sum();
+        int guaranteedLeft = guaranteedRollLimit - totalAffixModeRoll;
+        
+        // If we still owe guaranteedLeft > 0 AND remainingUpgrades == guaranteedLeft,
+        // force an affix now—even if slotNumber wasn't 1 or 2 originally:
+        if (definedAffixMode && guaranteedLeft > 0 && remainingUpgrades == guaranteedLeft) {
+            slotNumber = artifact.generateRandomSlot(definedAffixMode); // 1 or 2
+            isGuaranteedRoll = true;
+        }
+		
 		switch (slotNumber) {
 			case 1 -> {
 				artifactSubStats[0].addAttributeValue(artifact.generateSubAttributeValue(artifactSubStats[0].getAttributeName()));
 				currentUpgradedSubStat = artifact.formatSubStat(2, artifactSubStats[0]);
+				
+				if (isGuaranteedRoll) {
+					subStatUpgradeCounts.compute(artifactSubStats[0].getAttributeName(), (_, v) -> v + 1);
+					isGuaranteedRoll = false;
+				}
 			}
 			case 2 -> {
 				artifactSubStats[1].addAttributeValue(artifact.generateSubAttributeValue(artifactSubStats[1].getAttributeName()));
 				currentUpgradedSubStat = artifact.formatSubStat(2, artifactSubStats[1]);
+				
+				if (isGuaranteedRoll) {
+					subStatUpgradeCounts.compute(artifactSubStats[1].getAttributeName(), (_, v) -> v + 1);
+					isGuaranteedRoll = false;
+				}
 			}
 			case 3 -> {
 				artifactSubStats[2].addAttributeValue(artifact.generateSubAttributeValue(artifactSubStats[2].getAttributeName()));

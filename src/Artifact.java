@@ -228,7 +228,7 @@ public final class Artifact {
 		double[] probabilities = { 23.73, 39.55, 26.37, 8.79, 1.46, 0.09 };
 		double cumulativeProbability = 0;
 		
-		for (int i = 0; i <= upgradeTimes.length; i++) {
+		for (int i = 0; i < upgradeTimes.length; i++) {
 			cumulativeProbability += probabilities[i];
 			
 			if (upgradeTimesChance <= cumulativeProbability) {
@@ -241,10 +241,17 @@ public final class Artifact {
 	}
 	
 	public int generateRandomSlot() {
+		return generateRandomSlot(false);
+	}
+	
+	public int generateRandomSlot(boolean definedAffixMode) {
 		double slotChance = generateNumber();
+		
+		final int[] AFFIXED_SLOTS = { 1, 2 };
+		final int[] ALL_SLOTS = { 1, 2, 3, 4 };
 
-		int[] slots = { 1, 2, 3, 4 };
-		double[] probabilities = { 25.00, 25.00, 25.00, 25.00 };
+		int[] slots = definedAffixMode ? AFFIXED_SLOTS : ALL_SLOTS;
+		double[] probabilities = generateEqualProbabilities(slots.length);
 		double cumulativeProbability = 0;
 
 		for (int i = 0; i < slots.length; i++) {
@@ -257,6 +264,15 @@ public final class Artifact {
 
 		// If we reach here, something went wrong, so just return the first element
 		return slots[0];
+	}
+	
+	private double[] generateEqualProbabilities(int length) {
+	    double[] probabilities = new double[length];
+	    double value = 100.0 / length;
+	    
+	    Arrays.fill(probabilities, value);
+	    
+	    return probabilities;
 	}
 	
 	public double generateSubAttributeValue(String attributeName) throws NullPointerException, IllegalArgumentException {
@@ -569,7 +585,7 @@ public final class Artifact {
 	
 	private double generateAttributeValue(double[] attributeValues) {
 		double valueChance = generateNumber();
-		double[] probabilities = { 25.00, 25.00, 25.00, 25.00 };
+		double[] probabilities = generateEqualProbabilities(4);
 		double cumulativeProbability = 0;
 		
 		for (int i = 0; i < attributeValues.length; i++) {
@@ -586,11 +602,7 @@ public final class Artifact {
 	
 	// NUMBER GENERATOR
 	public double generateNumber() {
-		double min = 0;
-		double max = 100;
-		double randomValue = rand.nextDouble() * (max - min) + min;
-		// round to 2 decimal places
-		return Math.round(randomValue * 100.0) / 100.0;
+		return generateNumber(100);
 	}
 	
 	public double generateNumber(double maxNumber) {
