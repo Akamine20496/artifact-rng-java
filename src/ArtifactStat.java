@@ -20,7 +20,7 @@ public final class ArtifactStat {
 	private boolean definedAffixMode = false;
 	private boolean isGuaranteedRoll = false;
 	
-	private int guaranteedRollLimit = 2;
+	private int guaranteedRollLimit = 0;
 	
 	private Map<String, Integer> subStatUpgradeCounts = new HashMap<>();
 	
@@ -62,6 +62,20 @@ public final class ArtifactStat {
 		} else {
 			throw new IllegalArgumentException("Max Upgrade is either 4 or 5");
 		}
+	}
+	
+	public void setReshapeConfig(ReshapeConfig reshapeConfig) {
+		Map<String, Integer> incomingMap = reshapeConfig.subStatUpgradeCounts();
+		
+		if (incomingMap.size() != 2) {
+	        throw new IllegalArgumentException("Must contain at most 2 entries, but got " + incomingMap.size());
+	    }
+		
+		definedAffixMode = true;
+		
+		this.subStatUpgradeCounts.clear();
+		this.subStatUpgradeCounts.putAll(reshapeConfig.subStatUpgradeCounts());
+		this.guaranteedRollLimit = reshapeConfig.guaranteedRollLimit();
 	}
 
 	public String getArtifactPiece() {
@@ -161,6 +175,8 @@ public final class ArtifactStat {
 										artifactSubStats[1].getAttributeName(), 
 										artifactSubStats[2].getAttributeName());
 		
+		guaranteedRollLimit = 2;
+		
 		subStatUpgradeCounts.put(artifactSubStats[0].getAttributeName(), 0);
 		subStatUpgradeCounts.put(artifactSubStats[1].getAttributeName(), 0);
 	}
@@ -191,7 +207,7 @@ public final class ArtifactStat {
 		isMax = false;
 		
 		definedAffixMode = false;
-		
+		guaranteedRollLimit = 0;
 		subStatUpgradeCounts.clear();
 	}
 	
@@ -217,17 +233,18 @@ public final class ArtifactStat {
 						
                         // If we still owe some guaranteed rolls, AND there are exactly that many +1's left, force now:
                         if (definedAffixMode && guaranteedLeft > 0 && remainingUpgrades == guaranteedLeft) {
-                            slotNumber = artifact.generateRandomSlot(definedAffixMode); // force 1 or 2
+                            slotNumber = artifact.generateRandomSlot(getSlotsFromUpgradeCounts()); // force based on the subStatUpgradeCounts
                             isGuaranteedRoll = true;
                         } else {
                             // Normal 50% chance for affix vs all‐slots:
                             double randomChance = artifact.generateNumber();
                             
                             if (definedAffixMode && totalAffixModeRoll != guaranteedRollLimit && randomChance <= 50.00) {
-                                slotNumber = artifact.generateRandomSlot(definedAffixMode);
+                            	slotNumber = artifact.generateRandomSlot(getSlotsFromUpgradeCounts()); // force based on the subStatUpgradeCounts
                                 isGuaranteedRoll = true;
                             } else {
                                 slotNumber = artifact.generateRandomSlot();
+                                isGuaranteedRoll = false;
                             }
                         }
 						
@@ -273,37 +290,19 @@ public final class ArtifactStat {
         // If we still owe guaranteedLeft > 0 AND remainingUpgrades == guaranteedLeft,
         // force an affix now—even if slotNumber wasn't 1 or 2 originally:
         if (definedAffixMode && guaranteedLeft > 0 && remainingUpgrades == guaranteedLeft) {
-            slotNumber = artifact.generateRandomSlot(definedAffixMode); // 1 or 2
+        	slotNumber = artifact.generateRandomSlot(getSlotsFromUpgradeCounts()); // force based on the subStatUpgradeCounts
             isGuaranteedRoll = true;
         }
+        
+        // retrieve the ArtifactSubStat object based on the slotNumber and upgrade its value
+        ArtifactSubStat subStat = artifactSubStats[slotNumber - 1];
+        
+        subStat.addAttributeValue(artifact.generateSubAttributeValue(subStat.getAttributeName()));
+		currentUpgradedSubStat = artifact.formatSubStat(2, subStat);
 		
-		switch (slotNumber) {
-			case 1 -> {
-				artifactSubStats[0].addAttributeValue(artifact.generateSubAttributeValue(artifactSubStats[0].getAttributeName()));
-				currentUpgradedSubStat = artifact.formatSubStat(2, artifactSubStats[0]);
-				
-				if (isGuaranteedRoll) {
-					subStatUpgradeCounts.compute(artifactSubStats[0].getAttributeName(), (_, v) -> v + 1);
-					isGuaranteedRoll = false;
-				}
-			}
-			case 2 -> {
-				artifactSubStats[1].addAttributeValue(artifact.generateSubAttributeValue(artifactSubStats[1].getAttributeName()));
-				currentUpgradedSubStat = artifact.formatSubStat(2, artifactSubStats[1]);
-				
-				if (isGuaranteedRoll) {
-					subStatUpgradeCounts.compute(artifactSubStats[1].getAttributeName(), (_, v) -> v + 1);
-					isGuaranteedRoll = false;
-				}
-			}
-			case 3 -> {
-				artifactSubStats[2].addAttributeValue(artifact.generateSubAttributeValue(artifactSubStats[2].getAttributeName()));
-				currentUpgradedSubStat = artifact.formatSubStat(2, artifactSubStats[2]);
-			}
-			case 4 -> {
-				artifactSubStats[3].addAttributeValue(artifact.generateSubAttributeValue(artifactSubStats[3].getAttributeName()));
-				currentUpgradedSubStat = artifact.formatSubStat(2, artifactSubStats[3]);
-			}
+		if (isGuaranteedRoll) {
+			subStatUpgradeCounts.compute(subStat.getAttributeName(), (_, v) -> v + 1);
+			isGuaranteedRoll = false;
 		}
 		
 		upgradeCounter--;
@@ -555,5 +554,25 @@ public final class ArtifactStat {
         }
         
 		return addContainerToText(sb.toString());
+	}
+	
+	// Retrieving their index position
+	private int[] getSlotsFromUpgradeCounts() {
+		int[] matchedIndexes = new int[2];
+		int count = 0;
+
+		for (int i = 0; i < artifactSubStats.length && count < 2; i++) {
+		    ArtifactSubStat subStat = artifactSubStats[i];
+		    
+		    if (subStatUpgradeCounts.containsKey(subStat.getAttributeName())) {
+		        matchedIndexes[count++] = i + 1; // store 1-based index
+		    }
+		}
+
+		if (count < 2) {
+		    throw new IllegalStateException("Less than 2 matching attributes found");
+		}
+
+		return matchedIndexes;
 	}
 }

@@ -241,16 +241,18 @@ public final class Artifact {
 	}
 	
 	public int generateRandomSlot() {
-		return generateRandomSlot(false);
+		return generateRandomSlot(new int[] { 1, 2, 3, 4 });
 	}
 	
-	public int generateRandomSlot(boolean definedAffixMode) {
+	public int generateRandomSlot(int[] slots) {
+		if (slots == null || (slots.length != 2 && slots.length != 4)) {
+			int length = (slots == null) ? -1 : slots.length;
+			
+			throw new IllegalArgumentException("Invalid slot array: expected length 2 or 4, but got " + length);
+		}
+		
 		double slotChance = generateNumber();
 		
-		final int[] AFFIXED_SLOTS = { 1, 2 };
-		final int[] ALL_SLOTS = { 1, 2, 3, 4 };
-
-		int[] slots = definedAffixMode ? AFFIXED_SLOTS : ALL_SLOTS;
 		double[] probabilities = generateEqualProbabilities(slots.length);
 		double cumulativeProbability = 0;
 

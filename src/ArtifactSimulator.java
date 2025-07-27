@@ -42,6 +42,7 @@ public class ArtifactSimulator extends JFrame {
 	private JButton btnGenerate;
 	private JButton btnRoll;
 	private JButton btnReroll;
+	private JButton btnReshape;
 	private JButton btnReset;
 	private JButton btnLock;
 	private JButton btnCustomStat;
@@ -142,7 +143,7 @@ public class ArtifactSimulator extends JFrame {
 		
 		btnGenerate = new JButton("Generate");
 		btnGenerate.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		btnGenerate.setBounds(30, 120, 113, 30);
+		btnGenerate.setBounds(10, 120, 90, 30);
 		btnGenerate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (isLock) {
@@ -186,6 +187,7 @@ public class ArtifactSimulator extends JFrame {
 				btnSkip.setEnabled(false);
 				btnRoll.setEnabled(false);
 				btnReroll.setEnabled(false);
+				btnReshape.setEnabled(false);
 				btnReset.setEnabled(false);
 				btnGenerate.requestFocus();
 				rollCounter = 0;
@@ -218,6 +220,7 @@ public class ArtifactSimulator extends JFrame {
 					
 					if (rollCounter == maxUpgrade) {
 						btnRoll.setEnabled(false);
+						btnReshape.setEnabled(true);
 						btnReroll.requestFocus();
 					}
 					
@@ -237,7 +240,7 @@ public class ArtifactSimulator extends JFrame {
 		
 		btnReroll = new JButton("Reroll");
 		btnReroll.setFont(new Font("Segoe UI", Font.BOLD, 12));
-		btnReroll.setBounds(170, 120, 113, 30);
+		btnReroll.setBounds(110, 120, 90, 30);
 		btnReroll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				artifactStat.rerollStat();
@@ -246,6 +249,7 @@ public class ArtifactSimulator extends JFrame {
 				btnSkip.setEnabled(true);
 				btnRoll.setEnabled(true);
 				btnReroll.setEnabled(false);
+				btnReshape.setEnabled(false);
 				btnReset.setEnabled(true);
 				btnRoll.requestFocus();
 				rollCounter = 0;
@@ -289,6 +293,18 @@ public class ArtifactSimulator extends JFrame {
 				}
 			}
 		});
+		
+		btnReshape = new JButton("Reshape");
+		btnReshape.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ReshapeConfigDialog reshapeConfig = new ReshapeConfigDialog(frameAncestor, artifactStat);
+				reshapeConfig.setVisible(true);
+			}
+		});
+		btnReshape.setFont(new Font("Segoe UI", Font.BOLD, 12));
+		btnReshape.setEnabled(false);
+		btnReshape.setBounds(212, 120, 90, 30);
+		panelControls.add(btnReshape);
 		btnCustomStat.setFont(new Font("Segoe UI", Font.BOLD, 12));
 		btnCustomStat.setBounds(170, 243, 113, 30);
 		panelControls.add(btnCustomStat);
@@ -347,6 +363,7 @@ public class ArtifactSimulator extends JFrame {
 				btnSkip.setEnabled(false);
 				btnRoll.setEnabled(false);
 				btnReroll.setEnabled(true);
+				btnReshape.setEnabled(true);
 				btnReroll.requestFocus();
 			}
 		});
@@ -477,6 +494,9 @@ public class ArtifactSimulator extends JFrame {
 						</p>
 						<p>
 							<span class='emphasis'>Reroll</span>: Removes the upgrades of the sub-stats.
+						</p>
+						<p>
+							<span class='emphasis'>Reshape</span>: Upgrade rolls are guaranteed for two of the selected sub-stats.
 						</p>
 						<p>
 							<span class='emphasis'>Reset</span>: Clears the main attribute, sub-stats, and their values.
