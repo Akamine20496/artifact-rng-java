@@ -128,10 +128,16 @@ public final class ArtifactStat {
 		artifactSubStats[1] = artifact.generateSubStat(mainAttribute, artifactSubStats[0].getAttributeName());
 		artifactSubStats[2] = artifact.generateSubStat(mainAttribute, artifactSubStats[0].getAttributeName(), artifactSubStats[1].getAttributeName());
 		artifactSubStats[3] = maxUpgrade == 4 ? new ArtifactSubStat(null, 0) : 
-			artifact.generateSubStat(mainAttribute, 
-										artifactSubStats[0].getAttributeName(), 
-										artifactSubStats[1].getAttributeName(), 
-										artifactSubStats[2].getAttributeName());
+			artifact.generateSubStat(
+					mainAttribute, 
+					artifactSubStats[0].getAttributeName(), 
+					artifactSubStats[1].getAttributeName(), 
+					artifactSubStats[2].getAttributeName()
+			);
+		
+		if (maxUpgrade == 4) {
+			generatePreviewAttributeNameForFourthSubStat();
+		}
 	}
 	
 	private void generateFourthSubStat() throws NullPointerException {
@@ -139,10 +145,8 @@ public final class ArtifactStat {
 			throw new NullPointerException("mainAttribute is null and maxUpgrade is 0");
 		}
 		
-		artifactSubStats[3] = artifact.generateSubStat(mainAttribute, 
-														artifactSubStats[0].getAttributeName(), 
-														artifactSubStats[1].getAttributeName(), 
-														artifactSubStats[2].getAttributeName());
+		// Add the preview attribute to 4th sub-stat and generate value
+		artifactSubStats[3].applyPreviewAttributeNameToSubStat();
 		
 		currentNewSubStat = artifact.formatSubStat(0, artifactSubStats[3]);
 	}
@@ -175,6 +179,10 @@ public final class ArtifactStat {
 										artifactSubStats[1].getAttributeName(), 
 										artifactSubStats[2].getAttributeName());
 		
+		if (maxUpgrade == 4) {
+			generatePreviewAttributeNameForFourthSubStat();
+		}
+		
 		guaranteedRollLimit = 2;
 		
 		subStatUpgradeCounts.put(artifactSubStats[0].getAttributeName(), 0);
@@ -184,20 +192,29 @@ public final class ArtifactStat {
 	public void rerollStat() {
 		removeSubStatUpgrades();
 		
-		slotNumber = 0;
-		upgradeCounter = 0;
-		totalUpgrade = 0;
-		isMax = false;
+		if (maxUpgrade == 4) {
+			generatePreviewAttributeNameForFourthSubStat();
+		}
 		
 		if (definedAffixMode) {
 			subStatUpgradeCounts.put(artifactSubStats[0].getAttributeName(), 0);
 			subStatUpgradeCounts.put(artifactSubStats[1].getAttributeName(), 0);
 		}
+		
+		slotNumber = 0;
+		upgradeCounter = 0;
+		totalUpgrade = 0;
+		isMax = false;
 	}
 	
 	public void resetStat() {
 		resetSubStats();
 		
+		if (maxUpgrade == 4) {
+			artifactSubStats[3].setPreviewAttributeName(null);
+		}
+		
+		artifactPiece = null;
 		mainAttribute = null;
 		
 		slotNumber = 0;
@@ -574,5 +591,30 @@ public final class ArtifactStat {
 		}
 
 		return matchedIndexes;
+	}
+	
+	// generate preview attribute name for 4th slot (sub-stat)
+	public void generatePreviewAttributeNameForFourthSubStat() throws IllegalStateException {
+		if (maxUpgrade == 0) {
+	        throw new IllegalStateException("Max upgrade must not be 0.");
+	    }
+		
+	    if (artifactPiece == null) {
+	        throw new IllegalStateException("Artifact piece must not be null.");
+	    }
+	    
+	    if (mainAttribute == null) {
+	        throw new IllegalStateException("Main attribute must not be null.");
+	    }
+		
+		String previewAttributeName = 
+				artifact.generateSubAttribute(
+						mainAttribute, 
+						artifactSubStats[0].getAttributeName(), 
+						artifactSubStats[1].getAttributeName(), 
+						artifactSubStats[2].getAttributeName()
+				);
+		
+		artifactSubStats[3].setPreviewAttributeName(previewAttributeName);
 	}
 }

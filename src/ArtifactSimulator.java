@@ -177,7 +177,6 @@ public class ArtifactSimulator extends JFrame {
 				
 				lblStatus.setText("Max Upgrade : 0");
 				artifactStat.resetStat();
-				artifactStat.setArtifactPiece(null);
 				artifactDisplayerPanel.displayStat(); // update the stat
 				
 				JOptionPane.showMessageDialog(contentPane, "Stat is removed.");

@@ -1,5 +1,6 @@
 public class ArtifactSubStat {
 	private String attributeName;
+	private String previewAttributeName;
 	private double initialAttributeValue;
 	private double attributeValue;
 	private double prevAttributeValue;
@@ -15,6 +16,10 @@ public class ArtifactSubStat {
 	
 	public void setAttributeName(String attributeName) {
 		this.attributeName = attributeName;
+	}
+	
+	public void setPreviewAttributeName(String attributeName) {
+		previewAttributeName = artifact.isSubAttribute(attributeName);
 	}
 	
 	public void setInitialAttributeValue(double initialAttributeValue) {
@@ -50,19 +55,36 @@ public class ArtifactSubStat {
 		return isInitialValueEmpty;
 	}
 	
+	public void applyPreviewAttributeNameToSubStat() {
+		attributeName = previewAttributeName;
+		initialAttributeValue = attributeValue = artifact.generateSubAttributeValue(attributeName);
+		isInitialValueEmpty = false;
+		
+		previewAttributeName = null;
+	}
+	
 	public void addAttributeValue(double attributeValue) {
 		prevAttributeValue = this.attributeValue;
 		this.attributeValue += attributeValue;
 	}
 	
 	public String getSubStat() {
-		return attributeName == null ? "None" : artifact.formatSubStat(attributeName, attributeValue);
+		if (attributeName == null && previewAttributeName == null) {
+			return "None";
+		} else {
+			if (previewAttributeName != null) {
+				return String.format("(%s)", previewAttributeName);
+			} else {
+				return artifact.formatSubStat(attributeName, attributeValue);
+			}
+		}
 	}
 	
 	@Override
 	public String toString() {
 		return "ArtifactSubStat{" +
                 "attributeName='" + attributeName + '\'' +
+                ", previewAttributeName='" + previewAttributeName + '\'' +
                 ", initialAttributeValue=" + initialAttributeValue +
                 ", attributeValue=" + attributeValue +
                 ", prevAttributeValue=" + prevAttributeValue +
@@ -91,6 +113,8 @@ public class ArtifactSubStat {
 	    		Double.compare(prevAttributeValue, artifactSubStat.prevAttributeValue) == 0 &&
 	    		isInitialValueEmpty == artifactSubStat.isInitialValueEmpty &&
 	    		(attributeName == null ? artifactSubStat.attributeName == null : 
-	    		attributeName.equals(artifactSubStat.attributeName));
+	    		attributeName.equals(artifactSubStat.attributeName)) &&
+	    		(previewAttributeName == null ? artifactSubStat.previewAttributeName == null : 
+	    		previewAttributeName.equals(artifactSubStat.previewAttributeName));
 	}
 }

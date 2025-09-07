@@ -624,6 +624,7 @@ public class CustomStatDialog extends JDialog {
         } else {
             if (attr4 == null) {
             	artifactStat.setMaxUpgrade(4);
+            	artifactStat.generatePreviewAttributeNameForFourthSubStat();
             } else {
             	artifactStat.setMaxUpgrade(5);
             }

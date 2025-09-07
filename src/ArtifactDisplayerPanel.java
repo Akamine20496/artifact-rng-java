@@ -103,7 +103,23 @@ public class ArtifactDisplayerPanel extends JPanel {
 		int length = artifactStat.getArraySubStatsLength();
 		
 		for (int index = 0; index < length; index++) {
-			lblSlots[index].setText(displaySubStat(artifactStat.getSubStatAt(index).getSubStat()));
+			ArtifactSubStat subStat = artifactStat.getSubStatAt(index);
+			String text = displaySubStat(subStat.getSubStat());
+			Color color = lblSlots[index].getForeground();
+			
+			if (index == length - 1 && artifactStat.getMaxUpgrade() == 4) {
+				if (subStat.getIsInitialValueEmpty()) {					
+					text = subStat.getSubStat();
+					color = Color.LIGHT_GRAY;
+				} else {
+					color = new Color(40, 40, 40);
+				}
+			} else if (artifactStat.getMaxUpgrade() == 0) {
+				color = new Color(40, 40, 40);
+			}
+			
+			lblSlots[index].setText(text);
+		    lblSlots[index].setForeground(color);
 		}
 	}
 
