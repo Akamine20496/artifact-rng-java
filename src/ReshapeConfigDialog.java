@@ -52,7 +52,7 @@ public class ReshapeConfigDialog extends JDialog {
 		setResizable(false);
 		setSize(305, 300);
 		setLocationRelativeTo(owner);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(ArtifactSimulator.class.getResource("/assets/Amber Icon.jpg")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(ReshapeConfigDialog.class.getResource("/assets/Amber Icon.jpg")));
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);

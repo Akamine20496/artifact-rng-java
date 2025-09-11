@@ -54,7 +54,7 @@ public class ReshapeResultDialog extends JDialog {
 		setResizable(false);
 		setSize(431, 295);
 		setLocationRelativeTo(owner);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(ArtifactSimulator.class.getResource("/assets/Amber Icon.jpg")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(ReshapeResultDialog.class.getResource("/assets/Amber Icon.jpg")));
 		getContentPane().setLayout(null);
 		
 		JPanel panelBeforeStat = new JPanel();

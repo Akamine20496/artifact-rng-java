@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -136,7 +137,7 @@ public final class ArtifactStat {
 			);
 		
 		if (maxUpgrade == 4) {
-			generatePreviewAttributeNameForFourthSubStat();
+			generateSubStatPreviewForFourthSubStat();
 		}
 	}
 	
@@ -145,8 +146,8 @@ public final class ArtifactStat {
 			throw new NullPointerException("mainAttribute is null and maxUpgrade is 0");
 		}
 		
-		// Add the preview attribute to 4th sub-stat and generate value
-		artifactSubStats[3].applyPreviewAttributeNameToSubStat();
+		// Add the sub-stat preview to 4th slot
+		artifactSubStats[3].applySubStatPreviewToActualSubStat();
 		
 		currentNewSubStat = artifact.formatSubStat(0, artifactSubStats[3]);
 	}
@@ -174,16 +175,18 @@ public final class ArtifactStat {
 		
 		artifactSubStats[2] = artifact.generateSubStat(mainAttribute, artifactSubStats[0].getAttributeName(), artifactSubStats[1].getAttributeName());
 		artifactSubStats[3] = maxUpgrade == 4 ? new ArtifactSubStat(null, 0) : 
-			artifact.generateSubStat(mainAttribute, 
-										artifactSubStats[0].getAttributeName(), 
-										artifactSubStats[1].getAttributeName(), 
-										artifactSubStats[2].getAttributeName());
-		
-		if (maxUpgrade == 4) {
-			generatePreviewAttributeNameForFourthSubStat();
-		}
+			artifact.generateSubStat(
+					mainAttribute, 
+					artifactSubStats[0].getAttributeName(), 
+					artifactSubStats[1].getAttributeName(), 
+					artifactSubStats[2].getAttributeName()
+			);
 		
 		guaranteedRollLimit = 2;
+		
+		if (maxUpgrade == 4) {
+			generateSubStatPreviewForFourthSubStat();
+		}
 		
 		subStatUpgradeCounts.put(artifactSubStats[0].getAttributeName(), 0);
 		subStatUpgradeCounts.put(artifactSubStats[1].getAttributeName(), 0);
@@ -193,7 +196,7 @@ public final class ArtifactStat {
 		removeSubStatUpgrades();
 		
 		if (maxUpgrade == 4) {
-			generatePreviewAttributeNameForFourthSubStat();
+			generateSubStatPreviewForFourthSubStat();
 		}
 		
 		if (definedAffixMode) {
@@ -211,7 +214,7 @@ public final class ArtifactStat {
 		resetSubStats();
 		
 		if (maxUpgrade == 4) {
-			artifactSubStats[3].setPreviewAttributeName(null);
+			artifactSubStats[3].setSubStatPreview(null);
 		}
 		
 		artifactPiece = null;
@@ -522,6 +525,52 @@ public final class ArtifactStat {
         	}
         }
     }
+    
+    // Retrieving their index position
+ 	private int[] getSlotsFromUpgradeCounts() {
+ 		int[] matchedIndexes = new int[2];
+ 		int count = 0;
+
+ 		for (int i = 0; i < artifactSubStats.length && count < 2; i++) {
+ 		    ArtifactSubStat subStat = artifactSubStats[i];
+ 		    
+ 		    if (subStatUpgradeCounts.containsKey(subStat.getAttributeName())) {
+ 		        matchedIndexes[count++] = i + 1; // store 1-based index
+ 		    }
+ 		}
+
+ 		if (count < 2) {
+ 		    throw new IllegalStateException("Less than 2 matching attributes found");
+ 		}
+
+ 		return matchedIndexes;
+ 	}
+ 	
+ 	// generate sub-stat preview for 4th slot
+ 	public void generateSubStatPreviewForFourthSubStat() throws IllegalStateException {
+ 		if (maxUpgrade == 0) {
+ 	        throw new IllegalStateException("Max upgrade must not be 0.");
+ 	    }
+ 		
+ 	    if (artifactPiece == null) {
+ 	        throw new IllegalStateException("Artifact piece must not be null.");
+ 	    }
+ 	    
+ 	    if (mainAttribute == null) {
+ 	        throw new IllegalStateException("Main attribute must not be null.");
+ 	    }
+ 		
+ 		String attributeNamePreview = 
+ 				artifact.generateSubAttribute(
+ 						mainAttribute, 
+ 						artifactSubStats[0].getAttributeName(), 
+ 						artifactSubStats[1].getAttributeName(), 
+ 						artifactSubStats[2].getAttributeName()
+ 				);
+ 		double attributeValuePreview = artifact.generateSubAttributeValue(attributeNamePreview);
+ 		
+ 		artifactSubStats[3].setSubStatPreview(new SubStatPreview(attributeNamePreview, attributeValuePreview));
+ 	}
 	
 	private String addContainerToText(String str) {
 	    // Define a minimum width for the container
@@ -566,55 +615,21 @@ public final class ArtifactStat {
         sb.append("Max Upgrade: ").append(maxUpgrade).append("\n\n");
         sb.append("Sub-Stats:\n");
         
-        for (ArtifactSubStat subStat : artifactSubStats) {
-            sb.append(subStat.getSubStat()).append("\n");
+        int length = artifactSubStats.length;
+        
+        for (int index = 0; index < length; index++) {
+        	ArtifactSubStat artifactSubStat = artifactSubStats[index];
+        	String subStat = artifactSubStat.getSubStat();
+        	
+        	if (index == length - 1 && maxUpgrade == 4) {
+				if (artifactSubStat.getIsInitialValueEmpty()) {
+					subStat = String.format("(%s)", subStat);
+				}
+			}
+        	
+        	sb.append(subStat).append("\n");
         }
         
 		return addContainerToText(sb.toString());
-	}
-	
-	// Retrieving their index position
-	private int[] getSlotsFromUpgradeCounts() {
-		int[] matchedIndexes = new int[2];
-		int count = 0;
-
-		for (int i = 0; i < artifactSubStats.length && count < 2; i++) {
-		    ArtifactSubStat subStat = artifactSubStats[i];
-		    
-		    if (subStatUpgradeCounts.containsKey(subStat.getAttributeName())) {
-		        matchedIndexes[count++] = i + 1; // store 1-based index
-		    }
-		}
-
-		if (count < 2) {
-		    throw new IllegalStateException("Less than 2 matching attributes found");
-		}
-
-		return matchedIndexes;
-	}
-	
-	// generate preview attribute name for 4th slot (sub-stat)
-	public void generatePreviewAttributeNameForFourthSubStat() throws IllegalStateException {
-		if (maxUpgrade == 0) {
-	        throw new IllegalStateException("Max upgrade must not be 0.");
-	    }
-		
-	    if (artifactPiece == null) {
-	        throw new IllegalStateException("Artifact piece must not be null.");
-	    }
-	    
-	    if (mainAttribute == null) {
-	        throw new IllegalStateException("Main attribute must not be null.");
-	    }
-		
-		String previewAttributeName = 
-				artifact.generateSubAttribute(
-						mainAttribute, 
-						artifactSubStats[0].getAttributeName(), 
-						artifactSubStats[1].getAttributeName(), 
-						artifactSubStats[2].getAttributeName()
-				);
-		
-		artifactSubStats[3].setPreviewAttributeName(previewAttributeName);
 	}
 }

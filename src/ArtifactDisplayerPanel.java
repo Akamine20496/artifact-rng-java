@@ -109,7 +109,7 @@ public class ArtifactDisplayerPanel extends JPanel {
 			
 			if (index == length - 1 && artifactStat.getMaxUpgrade() == 4) {
 				if (subStat.getIsInitialValueEmpty()) {					
-					text = subStat.getSubStat();
+					text = String.format("(%s)", subStat.getSubStat());
 					color = Color.LIGHT_GRAY;
 				} else {
 					color = new Color(40, 40, 40);

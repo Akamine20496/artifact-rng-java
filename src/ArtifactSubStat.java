@@ -1,6 +1,7 @@
+import java.util.Objects;
+
 public class ArtifactSubStat {
 	private String attributeName;
-	private String previewAttributeName;
 	private double initialAttributeValue;
 	private double attributeValue;
 	private double prevAttributeValue;
@@ -8,18 +9,20 @@ public class ArtifactSubStat {
 	
 	private Artifact artifact = new Artifact();
 	
+	private SubStatPreview subStatPreview;
+	
 	public ArtifactSubStat(String attributeName, double attributeValue) {
 		this.attributeName = artifact.isSubAttribute(attributeName);
 		initialAttributeValue = this.attributeValue = artifact.isSubAttributeValue(attributeName, attributeValue);
-		isInitialValueEmpty = (attributeName == null);
+		isInitialValueEmpty = (initialAttributeValue == 0);
 	}
 	
 	public void setAttributeName(String attributeName) {
 		this.attributeName = attributeName;
 	}
 	
-	public void setPreviewAttributeName(String attributeName) {
-		previewAttributeName = artifact.isSubAttribute(attributeName);
+	public void setSubStatPreview(SubStatPreview subStatPreview) {
+		this.subStatPreview = subStatPreview;
 	}
 	
 	public void setInitialAttributeValue(double initialAttributeValue) {
@@ -55,12 +58,15 @@ public class ArtifactSubStat {
 		return isInitialValueEmpty;
 	}
 	
-	public void applyPreviewAttributeNameToSubStat() {
-		attributeName = previewAttributeName;
-		initialAttributeValue = attributeValue = artifact.generateSubAttributeValue(attributeName);
-		isInitialValueEmpty = false;
+	public void applySubStatPreviewToActualSubStat() {
+		String attributeNamePreview = subStatPreview.attributeName();
+		double attributeValuePreview = subStatPreview.attributeValue();
 		
-		previewAttributeName = null;
+		attributeName = artifact.isSubAttribute(attributeNamePreview);
+		initialAttributeValue = attributeValue = artifact.isSubAttributeValue(attributeNamePreview, attributeValuePreview);
+		isInitialValueEmpty = (initialAttributeValue == 0);
+		
+		subStatPreview = null;
 	}
 	
 	public void addAttributeValue(double attributeValue) {
@@ -69,11 +75,11 @@ public class ArtifactSubStat {
 	}
 	
 	public String getSubStat() {
-		if (attributeName == null && previewAttributeName == null) {
+		if (attributeName == null && subStatPreview == null) {
 			return "None";
 		} else {
-			if (previewAttributeName != null) {
-				return String.format("(%s)", previewAttributeName);
+			if (subStatPreview != null) {
+				return artifact.formatSubStat(subStatPreview.attributeName(), subStatPreview.attributeValue());
 			} else {
 				return artifact.formatSubStat(attributeName, attributeValue);
 			}
@@ -84,11 +90,11 @@ public class ArtifactSubStat {
 	public String toString() {
 		return "ArtifactSubStat{" +
                 "attributeName='" + attributeName + '\'' +
-                ", previewAttributeName='" + previewAttributeName + '\'' +
                 ", initialAttributeValue=" + initialAttributeValue +
                 ", attributeValue=" + attributeValue +
                 ", prevAttributeValue=" + prevAttributeValue +
                 ", isInitialValueEmpty=" + isInitialValueEmpty +
+                ", subStatPreview='" + (subStatPreview != null ? subStatPreview.toString() : "null") + '\'' +
                 '}';
 	}
 	
@@ -112,9 +118,10 @@ public class ArtifactSubStat {
 	    		Double.compare(attributeValue, artifactSubStat.attributeValue) == 0 &&
 	    		Double.compare(prevAttributeValue, artifactSubStat.prevAttributeValue) == 0 &&
 	    		isInitialValueEmpty == artifactSubStat.isInitialValueEmpty &&
-	    		(attributeName == null ? artifactSubStat.attributeName == null : 
-	    		attributeName.equals(artifactSubStat.attributeName)) &&
-	    		(previewAttributeName == null ? artifactSubStat.previewAttributeName == null : 
-	    		previewAttributeName.equals(artifactSubStat.previewAttributeName));
+	    		Objects.equals(attributeName, artifactSubStat.attributeName) &&
+	    		((subStatPreview == null && artifactSubStat.subStatPreview == null) || 
+	    		(subStatPreview != null && artifactSubStat.subStatPreview != null &&
+	    		Double.compare(subStatPreview.attributeValue(), artifactSubStat.subStatPreview.attributeValue()) == 0 &&
+	    		Objects.equals(subStatPreview.attributeName(), artifactSubStat.subStatPreview.attributeName())));
 	}
 }

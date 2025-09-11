@@ -371,7 +371,7 @@ public class CustomStatDialog extends JDialog {
 								result = result.trim();
 								
 								if (result.isBlank()) {
-									JOptionPane.showMessageDialog(contentPane, "Enter the slot number to add the stat!");
+									JOptionPane.showMessageDialog(contentPane, "Enter the slot number to add the sub-stat!");
 								} else if (attribute.equals(lblAttr1.getText()) || attribute.equals(lblAttr2.getText()) || 
 										attribute.equals(lblAttr3.getText()) || attribute.equals(lblAttr4.getText())) {
 									JOptionPane.showMessageDialog(contentPane, attribute + " is already been added!");
@@ -624,7 +624,7 @@ public class CustomStatDialog extends JDialog {
         } else {
             if (attr4 == null) {
             	artifactStat.setMaxUpgrade(4);
-            	artifactStat.generatePreviewAttributeNameForFourthSubStat();
+            	artifactStat.generateSubStatPreviewForFourthSubStat();
             } else {
             	artifactStat.setMaxUpgrade(5);
             }
