@@ -464,7 +464,7 @@ public class CustomStatDialog extends JDialog {
 							result = result.trim();
 							
 							if (result.isBlank()) {
-								JOptionPane.showMessageDialog(contentPane, "Enter the slot number to remove the stat!");
+								JOptionPane.showMessageDialog(contentPane, "Enter the slot number to remove the sub-stat!");
 							} else {
 								switch (result) {
 									case "1" -> {

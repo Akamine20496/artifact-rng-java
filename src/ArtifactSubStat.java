@@ -6,6 +6,7 @@ public class ArtifactSubStat {
 	private double attributeValue;
 	private double prevAttributeValue;
 	private boolean isInitialValueEmpty;
+	private int rollCount;
 	
 	private Artifact artifact = new Artifact();
 	
@@ -58,6 +59,20 @@ public class ArtifactSubStat {
 		return isInitialValueEmpty;
 	}
 	
+	public int getUpgradeCount() {
+		return rollCount;
+	}
+	
+	public void incrementRollCount() {
+		if (rollCount <= 5) {
+			rollCount++;
+		}
+	}
+	
+	public void resetRollCount() {
+		rollCount = 0;
+	}
+	
 	public void applySubStatPreviewToActualSubStat() {
 		String attributeNamePreview = subStatPreview.attributeName();
 		double attributeValuePreview = subStatPreview.attributeValue();
@@ -81,7 +96,7 @@ public class ArtifactSubStat {
 			if (subStatPreview != null) {
 				return artifact.formatSubStat(subStatPreview.attributeName(), subStatPreview.attributeValue());
 			} else {
-				return artifact.formatSubStat(attributeName, attributeValue);
+				return String.format("(%d) ", rollCount) + artifact.formatSubStat(attributeName, attributeValue);
 			}
 		}
 	}
@@ -94,7 +109,8 @@ public class ArtifactSubStat {
                 ", attributeValue=" + attributeValue +
                 ", prevAttributeValue=" + prevAttributeValue +
                 ", isInitialValueEmpty=" + isInitialValueEmpty +
-                ", subStatPreview='" + (subStatPreview != null ? subStatPreview.toString() : "null") + '\'' +
+                ", rollCount=" + rollCount +
+                ", subStatPreview=" + (subStatPreview != null ? subStatPreview.toString() : "null") +
                 '}';
 	}
 	
@@ -118,10 +134,10 @@ public class ArtifactSubStat {
 	    		Double.compare(attributeValue, artifactSubStat.attributeValue) == 0 &&
 	    		Double.compare(prevAttributeValue, artifactSubStat.prevAttributeValue) == 0 &&
 	    		isInitialValueEmpty == artifactSubStat.isInitialValueEmpty &&
+	    		rollCount == artifactSubStat.rollCount &&
 	    		Objects.equals(attributeName, artifactSubStat.attributeName) &&
 	    		((subStatPreview == null && artifactSubStat.subStatPreview == null) || 
 	    		(subStatPreview != null && artifactSubStat.subStatPreview != null &&
-	    		Double.compare(subStatPreview.attributeValue(), artifactSubStat.subStatPreview.attributeValue()) == 0 &&
-	    		Objects.equals(subStatPreview.attributeName(), artifactSubStat.subStatPreview.attributeName())));
+	    		subStatPreview.equals(artifactSubStat.subStatPreview)));
 	}
 }

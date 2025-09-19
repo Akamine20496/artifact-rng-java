@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -318,6 +317,7 @@ public final class ArtifactStat {
         ArtifactSubStat subStat = artifactSubStats[slotNumber - 1];
         
         subStat.addAttributeValue(artifact.generateSubAttributeValue(subStat.getAttributeName()));
+        subStat.incrementRollCount();
 		currentUpgradedSubStat = artifact.formatSubStat(2, subStat);
 		
 		if (isGuaranteedRoll) {
@@ -450,6 +450,8 @@ public final class ArtifactStat {
 				artifactSubStat.setAttributeValue(artifactSubStat.getInitialAttributeValue());
 				artifactSubStat.setPrevAttributeValue(artifactSubStat.getAttributeValue());
 			}
+			
+			artifactSubStat.resetRollCount();
 		}
 	}
 	
@@ -460,6 +462,7 @@ public final class ArtifactStat {
 			artifactSubStat.setAttributeName(null);
 			artifactSubStat.setInitialAttributeValue(0);
 			artifactSubStat.setPrevAttributeValue(artifactSubStat.getAttributeValue());
+			artifactSubStat.resetRollCount();
 		}
 	}
 	
