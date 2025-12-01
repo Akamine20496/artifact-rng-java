@@ -67,6 +67,7 @@ public class CustomStatDialog extends JDialog {
 	private JPanel contentPane;
 	private JCheckBox chkDefinedAffixMode;
 	private boolean definedAffixMode;
+	private boolean enablePreviewSubStat;
 	
 	/**
 	 * Create the dialog.
@@ -130,12 +131,30 @@ public class CustomStatDialog extends JDialog {
 							lblAttr3.getText().equals(attribute) || lblAttr4.getText().equals(attribute)) {
 					JOptionPane.showMessageDialog(contentPane, "A sub-stat cannot be the same as the main attribute!");
 				} else {
-					int response = JOptionPane.showConfirmDialog(contentPane, "Finalize the stat?", "Select an option", JOptionPane.YES_NO_OPTION);
+					int response1 = JOptionPane.showConfirmDialog(
+							contentPane, 
+							"Are these sub-stats initialized with 4 sub-stats? (not 3 sub-stats with preview sub-stat)", 
+							"Initial 4 sub-stats?", 
+							JOptionPane.YES_NO_OPTION
+					);
 					
-					if (response == JOptionPane.YES_OPTION) {
-                    	displayCustomStat();
-                        isCustomStatDisplayed = true;
-                		dispose();
+					if (response1 == JOptionPane.YES_OPTION || response1 == JOptionPane.NO_OPTION) {						
+						if (response1 == JOptionPane.NO_OPTION) {
+							enablePreviewSubStat = true;
+						}
+						
+						int response2 = JOptionPane.showConfirmDialog(
+								contentPane, 
+								"Finalize the stat?", 
+								"Select an option", 
+								JOptionPane.YES_NO_OPTION
+						);
+						
+						if (response2 == JOptionPane.YES_OPTION) {
+							displayCustomStat();
+							isCustomStatDisplayed = true;
+							dispose();
+						}
 					}
 				}
 			}
@@ -612,11 +631,15 @@ public class CustomStatDialog extends JDialog {
         double value3 = (double) cboAttrValue3.getSelectedItem();
         double value4 = (double) cboAttrValue4.getSelectedItem();
 
+        ArtifactSubStat subStat4 = enablePreviewSubStat ? new ArtifactSubStat(null, 0.0) : new ArtifactSubStat(attr4, value4);
+        
         artifactStat.setArtifactPiece(artifactPiece);
         artifactStat.setMainAttribute(mainAttribute);
         artifactStat.updateArtifactSubStats(
-        		new ArtifactSubStat(attr1, value1), new ArtifactSubStat(attr2, value2),
-        		new ArtifactSubStat(attr3, value3), new ArtifactSubStat(attr4, value4)
+        		new ArtifactSubStat(attr1, value1), 
+        		new ArtifactSubStat(attr2, value2),
+        		new ArtifactSubStat(attr3, value3), 
+        		subStat4
         );
 
         if ((attr1 != null && attr2 != null) && (attr3 == null || definedAffixMode)) {
@@ -625,13 +648,13 @@ public class CustomStatDialog extends JDialog {
             if (attr4 == null) {
             	artifactStat.setMaxUpgrade(4);
             	artifactStat.generateSubStatPreviewForFourthSubStat();
+            } else if (enablePreviewSubStat) {
+            	artifactStat.setMaxUpgrade(4);
+            	artifactStat.getSubStatAt(3).setSubStatPreview(new SubStatPreview(attr4, value4));
             } else {
             	artifactStat.setMaxUpgrade(5);
             }
         }
-        
-        // clear the object
-        artifactStat = null;
 	}
 	
 	public static boolean getIsCustomStatDisplayed() {
