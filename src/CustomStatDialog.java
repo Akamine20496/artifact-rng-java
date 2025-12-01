@@ -131,18 +131,21 @@ public class CustomStatDialog extends JDialog {
 							lblAttr3.getText().equals(attribute) || lblAttr4.getText().equals(attribute)) {
 					JOptionPane.showMessageDialog(contentPane, "A sub-stat cannot be the same as the main attribute!");
 				} else {
-					int response1 = JOptionPane.showConfirmDialog(
-							contentPane, 
-							"Are these sub-stats initialized with 4 sub-stats? (not 3 sub-stats with preview sub-stat)", 
-							"Initial 4 sub-stats?", 
-							JOptionPane.YES_NO_OPTION
-					);
+					boolean attr4HasAttributeName = !isNone(lblAttr4.getText());
+					int response1 = -69; // funny number but reasonable
 					
-					if (response1 == JOptionPane.YES_OPTION || response1 == JOptionPane.NO_OPTION) {						
-						if (response1 == JOptionPane.NO_OPTION) {
-							enablePreviewSubStat = true;
-						}
+					if (attr4HasAttributeName) {
+						response1 = JOptionPane.showConfirmDialog(
+								contentPane, 
+								"Are these sub-stats initialized with 4 sub-stats? (not 3 sub-stats with preview sub-stat)", 
+								"Initial 4 sub-stats?", 
+								JOptionPane.YES_NO_OPTION
+						);
 						
+						enablePreviewSubStat = (response1 == JOptionPane.NO_OPTION);
+					}
+					
+					if (!attr4HasAttributeName || (response1 == JOptionPane.YES_OPTION || response1 == JOptionPane.NO_OPTION)) {
 						int response2 = JOptionPane.showConfirmDialog(
 								contentPane, 
 								"Finalize the stat?", 
@@ -623,8 +626,8 @@ public class CustomStatDialog extends JDialog {
 
         String attr1 = lblAttr1.getText();
         String attr2 = lblAttr2.getText();
-        String attr3 = lblAttr3.getText().equals("None") ? null : lblAttr3.getText();
-        String attr4 = lblAttr4.getText().equals("None") ? null : lblAttr4.getText();
+        String attr3 = isNone(lblAttr3.getText()) ? null : lblAttr3.getText();
+        String attr4 = isNone(lblAttr4.getText()) ? null : lblAttr4.getText();
 
         double value1 = (double) cboAttrValue1.getSelectedItem();
         double value2 = (double) cboAttrValue2.getSelectedItem();
